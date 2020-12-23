@@ -1,0 +1,19 @@
+resolver: lts-16.20
+
+extra-deps:
+- base-noprelude-4.13.0.0
+- envparse-0.4.1@sha256:989902e6368532548f61de1fa245ad2b39176cddd8743b20071af519a709ce30,2842
+- odd-jobs-0.2.2@sha256:6bb890a74f8f075e4f058dbe04ea16a60985c09944b76fcbd27061b785acefc8,6718
+- direct-daemonize-3.1@sha256:f33505932b8613267cd8ad2d51470af2c5708d750ddf55a5dd38292f04962dcc,1630
+- timing-convenience-0.1@sha256:7ff807a9a9e5596f2b18d45c5a01aefb91d4a98f6a1008d183b5c550f68f7cb7,2092
+
+ghc-options:
+  "$everything": -haddock
+
+packages:
+  - '.'
+
+nix:
+  enable: true
+  pure: false
+  packages: [glpk, pcre, zlib, postgresql_12]
