@@ -1,17 +1,17 @@
 module ControlPlane.Environment where
 
-import Env
-import Data.Time (NominalDiffTime)
-import Prelude      hiding (Reader)
+import           Data.Time                  (NominalDiffTime)
 import qualified Database.PostgreSQL.Simple as PG
+import           Env
+import           Prelude                    hiding (Reader)
 
-import ControlPlane.DB.Types
-import ControlPlane.DB
+import           ControlPlane.DB
+import           ControlPlane.DB.Types
 
 -- *Env datatypes are parsed as-is from the outside
 data ControlPlaneConfig
-  = ControlPlaneConfig { pgConfig     :: PG.ConnectInfo
-                       , poolConfig   :: PoolConfig
+  = ControlPlaneConfig { pgConfig   :: PG.ConnectInfo
+                       , poolConfig :: PoolConfig
                        } deriving (Show)
 
 data PoolConfig
@@ -26,10 +26,10 @@ getConfig = Env.parse id parseConfig
 parseConfig :: Parser Error ControlPlaneConfig
 parseConfig =
   ControlPlaneConfig <$> parseConnectInfo
-                     <*> parsePoolConfig       
+                     <*> parsePoolConfig
 
 parseConnectInfo :: Parser Error PG.ConnectInfo
-parseConnectInfo = 
+parseConnectInfo =
   PG.ConnectInfo <$> var str  "DB_HOST"     (help "PostgreSQL host")
                  <*> var port "DB_PORT"     (help "PostgreSQL port")
                  <*> var str  "DB_USER"     (help "PostgreSQL user")
@@ -37,7 +37,7 @@ parseConnectInfo =
                  <*> var str  "DB_DATABASE" (help "Control-Plane database")
 
 parsePoolConfig :: Parser Error PoolConfig
-parsePoolConfig = 
+parsePoolConfig =
   PoolConfig <$> var (int >=> nonNegative) "DB_SUB_POOLS"        (help "Number of sub-pools")
              <*> var timeout               "DB_TIMEOUT"          (help "Timeout for each connection")
              <*> var (int >=> nonNegative) "DB_POOL_CONNECTIONS" (help "Number of connections per sub-pool")
@@ -57,16 +57,16 @@ mkControlPlaneEnv = do
 -- Env parser helpers
 
 int :: Reader Error Int
-int i = 
+int i =
   case readMaybe i of
     Nothing -> Left . unread . show $ i
     Just i' -> Right i'
 
 port :: Reader Error Word16
-port p = 
+port p =
   case int p of
     Left err -> Left err
-    Right intPort -> 
+    Right intPort ->
       if intPort >= 1 && intPort <= 65535
       then Right $ fromIntegral intPort
       else Left . unread . show $ p
