@@ -95,19 +95,30 @@ library:
   - relude
   - resource-pool
   - servant
-  - servant-client
-  - servant-client-core
   - servant-server
   - text
   - time
   - unordered-containers
   - uuid
   - vector
+  - wai
+  - warp
   source-dirs: src
 
 executables:
+  control-plane-routes:
+    source-dirs: app/layout
+    main: Main.hs
+    dependencies:
+    - base-noprelude
+    - control-plane
+    - relude
+    ghc-options:
+    - -rtsopts
+    - -threaded
+    - -with-rtsopts=-N
   control-plane-server:
-    source-dirs: app
+    source-dirs: app/server
     main: Main.hs
     dependencies:
     - base-noprelude

@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: f854d7834722606b2ad8c1ae82466835ddc7210046a5f466175d5e239b23b0f8
+-- hash: 43593c1c7deffa5c01d5c01855e07f26700852bfbb2bbabeabae3dd9a3221fab
 
 name:           control-plane
 version:        0.0.0
@@ -30,6 +30,8 @@ library
       ControlPlane.DB
       ControlPlane.DB.Types
       ControlPlane.Environment
+      ControlPlane.Model.Notification
+      ControlPlane.Server.API
       Prelude
   other-modules:
       Paths_control_plane
@@ -47,14 +49,32 @@ library
     , relude
     , resource-pool
     , servant
-    , servant-client
-    , servant-client-core
     , servant-server
     , text
     , time
     , unordered-containers
     , uuid
     , vector
+    , wai
+    , warp
+  if impl(ghc >= 8.4.4)
+    ghc-options: -Wall -Wcompat -Werror -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wpartial-fields -Wredundant-constraints -fhide-source-paths -Wno-unused-do-bind
+  else
+    ghc-options: -Wall -Wcompat -Werror -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wredundant-constraints -fhide-source-paths -Wno-unused-do-bind
+  default-language: Haskell2010
+
+executable control-plane-routes
+  main-is: Main.hs
+  other-modules:
+      Paths_control_plane
+  hs-source-dirs:
+      app/layout
+  default-extensions: ApplicativeDo BangPatterns ConstraintKinds DataKinds DefaultSignatures DeriveAnyClass DeriveFoldable DeriveFunctor DeriveGeneric DeriveLift DeriveTraversable DerivingStrategies DuplicateRecordFields EmptyCase ExistentialQuantification FlexibleContexts FlexibleInstances FunctionalDependencies GADTs GeneralizedNewtypeDeriving InstanceSigs KindSignatures LambdaCase MultiParamTypeClasses MultiWayIf NamedFieldPuns OverloadedStrings PatternSynonyms RankNTypes RecordWildCards ScopedTypeVariables StandaloneDeriving TupleSections TypeApplications TypeFamilies TypeFamilyDependencies TypeOperators
+  ghc-options: -rtsopts -threaded -with-rtsopts=-N
+  build-depends:
+      base-noprelude
+    , control-plane
+    , relude
   if impl(ghc >= 8.4.4)
     ghc-options: -Wall -Wcompat -Werror -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wpartial-fields -Wredundant-constraints -fhide-source-paths -Wno-unused-do-bind
   else
@@ -66,7 +86,7 @@ executable control-plane-server
   other-modules:
       Paths_control_plane
   hs-source-dirs:
-      app
+      app/server
   default-extensions: ApplicativeDo BangPatterns ConstraintKinds DataKinds DefaultSignatures DeriveAnyClass DeriveFoldable DeriveFunctor DeriveGeneric DeriveLift DeriveTraversable DerivingStrategies DuplicateRecordFields EmptyCase ExistentialQuantification FlexibleContexts FlexibleInstances FunctionalDependencies GADTs GeneralizedNewtypeDeriving InstanceSigs KindSignatures LambdaCase MultiParamTypeClasses MultiWayIf NamedFieldPuns OverloadedStrings PatternSynonyms RankNTypes RecordWildCards ScopedTypeVariables StandaloneDeriving TupleSections TypeApplications TypeFamilies TypeFamilyDependencies TypeOperators
   ghc-options: -rtsopts -threaded -with-rtsopts=-N
   build-depends:
