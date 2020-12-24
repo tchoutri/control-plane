@@ -1,18 +1,13 @@
 module Main (main) where
--- Tasty makes it easy to test your code. It is a test framework that can
--- combine many different types of tests into one suite. See its website for
--- help: <http://documentup.com/feuerbach/tasty>.
-import qualified Test.Tasty
--- Hspec is one of the providers for Tasty. It provides a nice syntax for
--- writing tests. Its website has more info: <https://hspec.github.io>.
-import Test.Tasty.Hspec
+
+import Test.Hspec
+
+import qualified NotificationModelSpec
 
 main :: IO ()
-main = do
-    test <- testSpec "control-plane" spec
-    Test.Tasty.defaultMain test
+main = hspec spec
+
 
 spec :: Spec
-spec = parallel $ do
-    it "is trivially true" $ do
-        True `shouldBe` True
+spec = do
+  describe "Notifiation model specs" NotificationModelSpec.spec

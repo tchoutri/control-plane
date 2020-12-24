@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 43593c1c7deffa5c01d5c01855e07f26700852bfbb2bbabeabae3dd9a3221fab
+-- hash: ff6c999290de2d90bcec44ae15212ef09623be5eb518185fb7cd1d9ad20f753b
 
 name:           control-plane
 version:        0.0.0
@@ -43,9 +43,9 @@ library
     , base-noprelude
     , envparse
     , mtl
-    , odd-jobs
     , pg-transact
     , postgresql-simple
+    , postgresql-simple-migration
     , relude
     , resource-pool
     , servant
@@ -103,16 +103,21 @@ test-suite control-plane-test
   type: exitcode-stdio-1.0
   main-is: Main.hs
   other-modules:
+      NotificationModelSpec
       Paths_control_plane
   hs-source-dirs:
       test
   default-extensions: ApplicativeDo BangPatterns ConstraintKinds DataKinds DefaultSignatures DeriveAnyClass DeriveFoldable DeriveFunctor DeriveGeneric DeriveLift DeriveTraversable DerivingStrategies DuplicateRecordFields EmptyCase ExistentialQuantification FlexibleContexts FlexibleInstances FunctionalDependencies GADTs GeneralizedNewtypeDeriving InstanceSigs KindSignatures LambdaCase MultiParamTypeClasses MultiWayIf NamedFieldPuns OverloadedStrings PatternSynonyms RankNTypes RecordWildCards ScopedTypeVariables StandaloneDeriving TupleSections TypeApplications TypeFamilies TypeFamilyDependencies TypeOperators
   build-depends:
-      base-noprelude
+      aeson
+    , aeson-pretty
+    , base-noprelude
     , control-plane
+    , hspec
     , relude
-    , tasty
-    , tasty-hspec
+    , string-qq
+    , time
+    , uuid
   if impl(ghc >= 8.4.4)
     ghc-options: -Wall -Wcompat -Werror -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wpartial-fields -Wredundant-constraints -fhide-source-paths -Wno-unused-do-bind
   else

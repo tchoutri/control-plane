@@ -19,29 +19,15 @@ packages:
   original:
     hackage: envparse-0.4.1@sha256:989902e6368532548f61de1fa245ad2b39176cddd8743b20071af519a709ce30,2842
 - completed:
-    hackage: odd-jobs-0.2.2@sha256:6bb890a74f8f075e4f058dbe04ea16a60985c09944b76fcbd27061b785acefc8,6718
+    hackage: postgresql-simple-migration-0.1.15.0@sha256:0e24e96908430f5caf9c1c1d9ca7c5c108e4e0409a255e2cbd77e8cd252dbb02,3879
     pantry-tree:
-      size: 2357
-      sha256: 16593747cbc70035535bba6ab740c52941c3403d5149bedbeb4ef8884d90f9a2
+      size: 766
+      sha256: c2843bfe43b804992bc913f33ec6b2c6cb0fc99c6d931b6ff85894e8aef9a99e
   original:
-    hackage: odd-jobs-0.2.2@sha256:6bb890a74f8f075e4f058dbe04ea16a60985c09944b76fcbd27061b785acefc8,6718
-- completed:
-    hackage: direct-daemonize-3.1@sha256:f33505932b8613267cd8ad2d51470af2c5708d750ddf55a5dd38292f04962dcc,1630
-    pantry-tree:
-      size: 220
-      sha256: 5cbf9c1ac065471cb9caa29136b06bcddee17800bbc3e8ed6020b4af19a81f3e
-  original:
-    hackage: direct-daemonize-3.1@sha256:f33505932b8613267cd8ad2d51470af2c5708d750ddf55a5dd38292f04962dcc,1630
-- completed:
-    hackage: timing-convenience-0.1@sha256:7ff807a9a9e5596f2b18d45c5a01aefb91d4a98f6a1008d183b5c550f68f7cb7,2092
-    pantry-tree:
-      size: 469
-      sha256: fbcb00f5b8a4f7b8fd94b034b7f507ffdd7579848de782ce60ad2b661dcb2b42
-  original:
-    hackage: timing-convenience-0.1@sha256:7ff807a9a9e5596f2b18d45c5a01aefb91d4a98f6a1008d183b5c550f68f7cb7,2092
+    hackage: postgresql-simple-migration-0.1.15.0@sha256:0e24e96908430f5caf9c1c1d9ca7c5c108e4e0409a255e2cbd77e8cd252dbb02,3879
 snapshots:
 - completed:
-    size: 532177
-    url: https://raw.githubusercontent.com/commercialhaskell/stackage-snapshots/master/lts/16/20.yaml
-    sha256: 0e14ba5603f01e8496e8984fd84b545a012ca723f51a098c6c9d3694e404dc6d
-  original: lts-16.20
+    size: 533252
+    url: https://raw.githubusercontent.com/commercialhaskell/stackage-snapshots/master/lts/16/26.yaml
+    sha256: cdbc5db9c1afe80a5998247939027a0c7db92fa0f20b5cd01596ec3da628b622
+  original: lts-16.26

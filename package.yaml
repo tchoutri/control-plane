@@ -89,9 +89,9 @@ library:
   - base-noprelude
   - envparse
   - mtl
-  - odd-jobs
   - pg-transact
   - postgresql-simple
+  - postgresql-simple-migration
   - relude
   - resource-pool
   - servant
@@ -134,8 +134,12 @@ tests:
     source-dirs: test
     main: Main.hs
     dependencies:
+    - aeson
+    - aeson-pretty
     - base-noprelude
     - control-plane
+    - hspec
     - relude
-    - tasty
-    - tasty-hspec
+    - string-qq
+    - time
+    - uuid

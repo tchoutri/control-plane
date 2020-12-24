@@ -2,6 +2,7 @@
 module ControlPlane.Server.API where
 
 import Data.UUID
+import Data.Maybe (fromJust)
 import Network.Wai.Handler.Warp (run)
 import Servant
 import Servant.API.Generic
@@ -44,12 +45,18 @@ routeLayout = layout (Proxy :: Proxy (ToServantApi NotificationsRoute))
 
 getNotifications :: ControlPlaneM [Notification]
 getNotifications = pure [n1]
-  where
-    nid = NotificationId nil
-    n1 = Notification { notificationId = nid, device = "Téléphone", title = "Notification!", message = "Bouh!" }
 
 getNotificationById :: NotificationId -> ControlPlaneM Notification
 getNotificationById _id = pure n1
+
+n1 :: Notification
+n1 = Notification { notificationId = nid
+                  , device     = "Téléphone"
+                  , title      = "Notification!"
+                  , message    = "Bouh!"
+                  , status     = NotificationUnread
+                  , receivedAt = time
+                  }
   where
     nid = NotificationId nil
-    n1 = Notification { notificationId = nid, device = "Téléphone", title = "Notification!", message = "Bouh!" }
+    time = fromJust . readMaybe $ "2020-12-24 10:26:34.815690388 UTC"
