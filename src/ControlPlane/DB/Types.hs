@@ -1,11 +1,13 @@
+{-# LANGUAGE StrictData #-}
 module ControlPlane.DB.Types
-  ( ConnectionPool
-  , ConnectInfo
-  , createPool
+  ( ConnectInfo
+  , ConnectionPool
+  , FromField
+  , IncoherentDataException (..)
+  , ToField
   , close
   , connect
-  , FromField
-  , ToField
+  , createPool
   ) where
 
 import Data.Pool                            (Pool, createPool)
@@ -15,3 +17,8 @@ import Database.PostgreSQL.Simple.ToField   (ToField)
 
 type ConnectionPool = Pool Connection
 
+newtype IncoherentDataException
+  = IDE { reason :: {-# UNPACK #-} Text
+        } deriving stock (Show, Eq)
+
+instance Exception IncoherentDataException 

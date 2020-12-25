@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: ff6c999290de2d90bcec44ae15212ef09623be5eb518185fb7cd1d9ad20f753b
+-- hash: 0831837f9301df08614a2484b2290b2014586ad87f360660a8505f56e3642a05
 
 name:           control-plane
 version:        0.0.0
@@ -28,10 +28,13 @@ source-repository head
 library
   exposed-modules:
       ControlPlane.DB
+      ControlPlane.DB.Helpers
+      ControlPlane.DB.Notification
       ControlPlane.DB.Types
       ControlPlane.Environment
       ControlPlane.Model.Notification
       ControlPlane.Server.API
+      ControlPlane.Server.API.Types
       Prelude
   other-modules:
       Paths_control_plane
@@ -41,9 +44,9 @@ library
   build-depends:
       aeson
     , base-noprelude
+    , colourista
     , envparse
     , mtl
-    , pg-transact
     , postgresql-simple
     , postgresql-simple-migration
     , relude

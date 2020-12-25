@@ -7,7 +7,7 @@ import Data.Maybe (fromJust)
 import Data.Aeson.Encode.Pretty
 import Data.String.QQ
 
-import ControlPlane.Model.Notification
+import ControlPlane.DB.Notification
 
 spec :: Spec
 spec = do

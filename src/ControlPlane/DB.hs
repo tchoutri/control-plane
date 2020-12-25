@@ -1,9 +1,6 @@
-module ControlPlane.DB where
+module ControlPlane.DB 
+  ( mkPool
+  ) where
 
-import Data.Time
-
-import ControlPlane.DB.Types
-
-mkPool :: ConnectInfo -> Int -> NominalDiffTime -> Int -> IO ConnectionPool
-mkPool connectInfo subPools timeout connections = 
-  createPool (connect connectInfo) close subPools timeout connections
+import ControlPlane.DB.Helpers
+ 

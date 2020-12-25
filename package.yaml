@@ -87,9 +87,9 @@ library:
   dependencies:
   - aeson
   - base-noprelude
+  - colourista
   - envparse
   - mtl
-  - pg-transact
   - postgresql-simple
   - postgresql-simple-migration
   - relude
