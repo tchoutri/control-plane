@@ -1,13 +1,26 @@
 {-# LANGUAGE StrictData #-}
-module ControlPlane.Server.API.Types where
+module ControlPlane.Server.API.Types
+  ( InternalError (..)
+  , ControlPlaneM (..)
+  , runControlPlaneM
+  ) where
 
-import Data.Aeson
+import Control.Monad.Except     (MonadError)
+import Servant                  (ServerError)
 
-data InternalError
-  = ConstraintFailure {-# UNPACK #-} Text
-  | NotificationNotFound
-  deriving stock (Show, Generic)
+import ControlPlane.DB.Types    (InternalError (..))
+import ControlPlane.Environment
 
-instance ToJSON InternalError where
-  toJSON (ConstraintFailure msg) = object [("error", "ConstraintFailure"), ("message", toJSON msg)]
-  toJSON NotificationNotFound    = object [("error", "NotificationNotFound"), ("message", "Notification not found ")]
+newtype ControlPlaneM m a 
+    = ControlPlaneM { getControlPlane :: (ReaderT ControlPlaneEnv (ExceptT ServerError m)) a }
+  deriving newtype ( Functor
+                   , Applicative
+                   , Monad
+                   , MonadIO
+                   , MonadReader ControlPlaneEnv
+                   , MonadError ServerError
+                   )
+
+runControlPlaneM :: ControlPlaneEnv -> ControlPlaneM m a -> m (Either ServerError a)
+runControlPlaneM env action =
+  runExceptT $ runReaderT (getControlPlane action) env

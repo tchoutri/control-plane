@@ -12,7 +12,7 @@ mkPool :: ConnectInfo -> Int -> NominalDiffTime -> Int -> IO ConnectionPool
 mkPool connectInfo subPools timeout connections = 
   createPool (connect connectInfo) close subPools timeout connections
 
-query :: (ToRow a, FromRow b) => ConnectionPool -> Query -> a -> IO (Either IncoherentDataException [b])
+query :: (ToRow a, FromRow b) => ConnectionPool -> Query -> a -> IO (Either InternalError [b])
 query pool q params = do
   logQuery q
   try . withResource pool $ \conn -> do

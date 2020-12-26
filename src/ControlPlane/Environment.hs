@@ -5,7 +5,7 @@ import qualified Database.PostgreSQL.Simple as PG
 import           Env
 import           Prelude                    hiding (Reader)
 
-import           ControlPlane.DB
+import           ControlPlane.DB.Helpers
 import           ControlPlane.DB.Types
 
 -- *Env datatypes are parsed as-is from the outside

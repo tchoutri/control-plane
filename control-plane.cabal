@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 0831837f9301df08614a2484b2290b2014586ad87f360660a8505f56e3642a05
+-- hash: f27a229f01fed568862191843c3d9b1994e7b9411a769d037f99d63ff62810af
 
 name:           control-plane
 version:        0.0.0
@@ -27,13 +27,14 @@ source-repository head
 
 library
   exposed-modules:
-      ControlPlane.DB
       ControlPlane.DB.Helpers
       ControlPlane.DB.Notification
       ControlPlane.DB.Types
       ControlPlane.Environment
       ControlPlane.Model.Notification
       ControlPlane.Server.API
+      ControlPlane.Server.API.Helpers
+      ControlPlane.Server.API.Notification
       ControlPlane.Server.API.Types
       Prelude
   other-modules:

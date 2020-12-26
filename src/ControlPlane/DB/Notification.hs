@@ -8,6 +8,7 @@ import Database.PostgreSQL.Simple.FromField (FromField (..), ResultError (..), r
 import Database.PostgreSQL.Simple.FromRow   (FromRow (..))
 import Database.PostgreSQL.Simple.ToField   (Action (..), ToField (..))
 import Database.PostgreSQL.Simple.ToRow     (ToRow (..))
+import Database.PostgreSQL.Simple (Only (..))
 import Servant
 
 import ControlPlane.DB.Types
@@ -74,7 +75,7 @@ instance FromRow Notification where
     status <- case (status', readAt) of
           (NotificationRead', Just ts)   -> pure $ NotificationRead ts
           (NotificationUnread', Nothing) -> pure NotificationUnread
-          _                              -> throw . IDE $ "Incoherent status for status ('"<> show status' <>"') and readAt ('" <> show readAt <> "') for notification " <> show notificationId
+          _                              -> throw . ConstraintFailure $ "Incoherent status for status ('"<> show status' <>"') and readAt ('" <> show readAt <> "') for notification " <> show notificationId
     pure Notification{..}
 
 instance ToRow Notification where
@@ -86,6 +87,10 @@ instance ToRow Notification where
 
 -- Request functions
 
-getNotifications :: ConnectionPool -> IO (Either IncoherentDataException [Notification])
+getNotifications :: ConnectionPool -> IO (Either InternalError [Notification])
 getNotifications pool = query pool q ()
   where q = "SELECT notification_id, device, title, message, received_at, status, read_at FROM notifications"
+
+getNotificationById :: ConnectionPool -> NotificationId -> IO (Either InternalError [Notification])
+getNotificationById pool notificationId = query pool q (Only notificationId)
+  where q = "SELECT notification_id, device, title, message, received_at, status, read_at FROM notifications WHERE notification_id = ?"
