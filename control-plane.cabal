@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: f27a229f01fed568862191843c3d9b1994e7b9411a769d037f99d63ff62810af
+-- hash: 68e0628785bbf2337b2b740e642424e5e1e5bf33523814800340ee39cc4f932b
 
 name:           control-plane
 version:        0.0.0
@@ -107,7 +107,7 @@ test-suite control-plane-test
   type: exitcode-stdio-1.0
   main-is: Main.hs
   other-modules:
-      NotificationModelSpec
+      Model.NotificationSpec
       Paths_control_plane
   hs-source-dirs:
       test

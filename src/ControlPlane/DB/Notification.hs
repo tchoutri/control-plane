@@ -1,3 +1,4 @@
+{-# LANGUAGE QuasiQuotes #-}
 module ControlPlane.DB.Notification where
 
 import Control.Exception
@@ -9,6 +10,7 @@ import Database.PostgreSQL.Simple.FromRow   (FromRow (..))
 import Database.PostgreSQL.Simple.ToField   (Action (..), ToField (..))
 import Database.PostgreSQL.Simple.ToRow     (ToRow (..))
 import Database.PostgreSQL.Simple (Only (..))
+import Database.PostgreSQL.Simple.SqlQQ
 import Servant
 
 import ControlPlane.DB.Types
@@ -89,8 +91,11 @@ instance ToRow Notification where
 
 getNotifications :: ConnectionPool -> IO (Either InternalError [Notification])
 getNotifications pool = query pool q ()
-  where q = "SELECT notification_id, device, title, message, received_at, status, read_at FROM notifications"
+  where q = [sql| SELECT notification_id, device, title, message, received_at, status, read_at
+                  FROM notifications |]
 
 getNotificationById :: ConnectionPool -> NotificationId -> IO (Either InternalError [Notification])
 getNotificationById pool notificationId = query pool q (Only notificationId)
-  where q = "SELECT notification_id, device, title, message, received_at, status, read_at FROM notifications WHERE notification_id = ?"
+  where q = [sql| SELECT notification_id, device, title, message, received_at, status, read_at
+                  FROM notifications
+                  WHERE notification_id = ? |]

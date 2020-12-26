@@ -2,7 +2,7 @@ module Main (main) where
 
 import Test.Hspec
 
-import qualified NotificationModelSpec
+import qualified Model.NotificationSpec as NotificationSpec
 
 main :: IO ()
 main = hspec spec
@@ -10,4 +10,4 @@ main = hspec spec
 
 spec :: Spec
 spec = do
-  describe "Notifiation model specs" NotificationModelSpec.spec
+  describe "Notifiation model specs" NotificationSpec.spec
