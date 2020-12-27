@@ -5,16 +5,19 @@ module ControlPlane.Server.API.Notification
   , getNotificationById
   ) where
 
+import Data.Time (getCurrentTime)
 import Servant
 import Servant.API.Generic
 import Control.Monad.Except (MonadError (..))
 import Servant.Server.Generic
 
-import           ControlPlane.DB.Notification    (Notification (..), NotificationId (..))
+import           ControlPlane.DB.Notification    (NewStatusPayload (..), Notification (..), NotificationId (..),
+                                                  NotificationPayload (..), NotificationStatus (..),
+                                                  NotificationStatusPayload (..))
 import qualified ControlPlane.DB.Notification    as DB
 import           ControlPlane.DB.Types           ()
 import           ControlPlane.Environment        (ControlPlaneEnv (..))
-import           ControlPlane.Model.Notification (NotificationPayload (..), mkNotification)
+import           ControlPlane.Model.Notification (mkNotification)
 import           ControlPlane.Server.API.Helpers
 import           ControlPlane.Server.API.Types
 
@@ -24,6 +27,9 @@ data NotificationsRoutes' mode
                                                  :> Get '[JSON] Notification
                          , postNotification :: mode :- ReqBody '[JSON] NotificationPayload
                                                     :> PostCreated '[JSON] NoContent
+                         , setNotificationStatus :: mode :- Capture "id" NotificationId
+                                                         :> "status" :> ReqBody '[JSON] NewStatusPayload
+                                                         :> Post '[JSON] NoContent
                          } deriving (Generic)
 
 type NotificationsRoutes = ToServantApi NotificationsRoutes'
@@ -34,6 +40,7 @@ notificationsRouteHandlers =
   NotificationsRoutes' { notifications = getAllNotifications
                        , notification  = getNotificationById
                        , postNotification = postNotificationHandler
+                       , setNotificationStatus = setNotificationStatusHandler
                        }
 
 getAllNotifications :: (MonadIO m, (MonadError ServerError (ControlPlaneM m)))
@@ -61,6 +68,22 @@ postNotificationHandler payload = do
   pool <- asks pgPool
   notification <- mkNotification payload
   result <- liftIO $ DB.insertNotification pool notification
+  case result of
+    Left err -> internalServerError err
+    Right _  -> pure NoContent
+
+setNotificationStatusHandler :: (MonadIO m, (MonadError ServerError (ControlPlaneM m)))
+                             => NotificationId -> NewStatusPayload
+                             -> ControlPlaneM m NoContent
+setNotificationStatusHandler notificationId NewStatusPayload{status=statusPayload} = do
+  pool <- asks pgPool
+  ts   <- liftIO getCurrentTime
+  let newStatus = case statusPayload of
+        SetAsRead   -> NotificationRead ts
+        SetAsUnread -> NotificationUnread
+  notification <- getNotificationById notificationId
+  let newNotification = notification{status = newStatus} :: Notification
+  result <- liftIO $ DB.updateNotification pool newNotification
   case result of
     Left err -> internalServerError err
     Right _  -> pure NoContent

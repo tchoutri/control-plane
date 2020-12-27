@@ -26,8 +26,8 @@ data NotificationStatus
   deriving stock (Eq, Show)
 
 instance ToJSON NotificationStatus where
-  toJSON (NotificationRead ts) = object [("status", "read"), ("readAt", toJSON ts)]
-  toJSON NotificationUnread    = object [("status", "unread")]
+  toJSON (NotificationRead ts) = object [("status", "Read"), ("readAt", toJSON ts)]
+  toJSON NotificationUnread    = object [("status", "Unread")]
 
 data Notification
   = Notification { notificationId :: NotificationId
@@ -87,6 +87,26 @@ instance ToRow Notification where
           NotificationUnread  -> (NotificationUnread', Nothing)
     in toRow Notification'{..}
 
+data NotificationPayload
+  = NotificationPayload { device  :: Text
+                        , title   :: Text
+                        , message :: Text
+                        } deriving stock (Eq, Show, Generic)
+                          deriving anyclass (FromJSON)
+
+newtype NewStatusPayload = NewStatusPayload { status :: NotificationStatusPayload }
+  deriving stock (Eq, Show, Generic)
+  deriving anyclass (FromJSON)
+
+data NotificationStatusPayload
+  = SetAsRead | SetAsUnread
+    deriving stock (Eq, Show, Generic)
+    deriving anyclass (FromJSON)
+
+instance ToField NotificationStatusPayload where
+  toField SetAsRead   = Escape "Read"
+  toField SetAsUnread = Escape "Unread"
+
 -- Request functions
 
 getNotifications :: ConnectionPool -> IO (Either InternalError [Notification])
@@ -105,3 +125,14 @@ insertNotification pool notification = execute pool q notification
   where q = [sql| INSERT INTO notifications 
                   (notification_id, device, title, message, received_at, status, read_at)
                   VALUES (?,?,?,?,?,?,?) |]
+
+updateNotification :: ConnectionPool -> Notification -> IO (Either InternalError NoContent)
+updateNotification pool Notification{..} = do
+  execute pool q params
+    where q = [sql| UPDATE notifications
+                    SET (status, read_at) = (?,?) 
+                    WHERE notification_id = (?)
+                    |]
+          params = case status of
+                      (NotificationRead ts) -> (NotificationRead', Just ts, notificationId)
+                      NotificationUnread  -> (NotificationUnread', Nothing, notificationId)
