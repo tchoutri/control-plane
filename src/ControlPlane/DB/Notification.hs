@@ -14,7 +14,7 @@ import Database.PostgreSQL.Simple.SqlQQ
 import Servant
 
 import ControlPlane.DB.Types
-import ControlPlane.DB.Helpers (query)
+import ControlPlane.DB.Helpers (query, execute)
 
 newtype NotificationId = NotificationId { getNotificationId :: UUID }
   deriving stock (Eq, Generic)
@@ -99,3 +99,9 @@ getNotificationById pool notificationId = query pool q (Only notificationId)
   where q = [sql| SELECT notification_id, device, title, message, received_at, status, read_at
                   FROM notifications
                   WHERE notification_id = ? |]
+
+insertNotification :: ConnectionPool -> Notification -> IO (Either InternalError NoContent)
+insertNotification pool notification = execute pool q notification
+  where q = [sql| INSERT INTO notifications 
+                  (notification_id, device, title, message, received_at, status, read_at)
+                  VALUES (?,?,?,?,?,?,?) |]

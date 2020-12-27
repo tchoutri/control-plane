@@ -22,6 +22,7 @@ type ConnectionPool = Pool Connection
 data InternalError
   = ConstraintFailure {-# UNPACK #-} Text
   | NotificationNotFound {-# UNPACK #-} UUID
+  | InsertionError
   deriving stock (Show, Generic)
 
 instance Exception InternalError
@@ -29,3 +30,4 @@ instance Exception InternalError
 instance ToJSON InternalError where
   toJSON (ConstraintFailure msg)   = object [("error", "ConstraintFailure"), ("message", toJSON msg)]
   toJSON (NotificationNotFound _) = object [("error", "NotificationNotFound"), ("message", "Notification not found ")]
+  toJSON InsertionError = object [("error", "InsertionError"), ("message","Could not insert incoming notification payload into database")]
