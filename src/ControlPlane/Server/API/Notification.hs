@@ -5,20 +5,21 @@ module ControlPlane.Server.API.Notification
   , getNotificationById
   ) where
 
-import Data.Time (getCurrentTime)
-import Servant
-import Servant.API.Generic
-import Control.Monad.Except (MonadError (..))
-import Servant.Server.Generic
+import           Control.Monad.Except            (MonadError (..))
+import           Data.Time                       (getCurrentTime)
+import           Database.PostgreSQL.Simple      (Only (..))
+import           Servant
+import           Servant.API.Generic
+import           Servant.Server.Generic
 
 import           ControlPlane.DB.Notification    (NewStatusPayload (..), Notification (..), NotificationId (..),
                                                   NotificationPayload (..), NotificationStatus (..),
                                                   NotificationStatusPayload (..))
 import qualified ControlPlane.DB.Notification    as DB
-import           ControlPlane.DB.Types           ()
+-- import           ControlPlane.DB.Types           ()
 import           ControlPlane.Environment        (ControlPlaneEnv (..))
 import           ControlPlane.Model.Notification (mkNotification)
-import           ControlPlane.Server.API.Helpers
+import           ControlPlane.Server.API.Helpers (internalServerError)
 import           ControlPlane.Server.API.Types
 
 data NotificationsRoutes' mode
@@ -30,7 +31,7 @@ data NotificationsRoutes' mode
                          , setNotificationStatus :: mode :- Capture "id" NotificationId
                                                          :> "status" :> ReqBody '[JSON] NewStatusPayload
                                                          :> Post '[JSON] NoContent
-                         } deriving (Generic)
+                         } deriving stock (Generic)
 
 type NotificationsRoutes = ToServantApi NotificationsRoutes'
 
@@ -59,8 +60,7 @@ getNotificationById notificationId = do
   result <- liftIO $ DB.getNotificationById pool notificationId
   case result of
     Left err  -> internalServerError err
-    Right [n] -> pure n
-    Right _   -> internalServerError (NotificationNotFound (getNotificationId notificationId))
+    Right (Only n) -> pure n
 
 postNotificationHandler :: (MonadIO m, (MonadError ServerError (ControlPlaneM m)))
                         => NotificationPayload -> ControlPlaneM m NoContent

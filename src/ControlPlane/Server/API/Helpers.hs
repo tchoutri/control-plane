@@ -12,9 +12,12 @@ internalServerError :: (MonadIO m, MonadError ServerError (ControlPlaneM m))
 internalServerError (ConstraintFailure msg) = do
   liftIO . redMessage $ "[!] " <> msg
   throwError $ err500 { errBody = encode $ ConstraintFailure msg }
-internalServerError (NotificationNotFound nid) = do
-  liftIO . redMessage $ "[!] " <> "Notification " <> show nid <> " not found"
-  throwError $ err404 { errBody = encode $ NotificationNotFound nid }
+internalServerError NotFound  = do
+  liftIO . redMessage $ "[!] " <> "Notification not found"
+  throwError $ err404 { errBody = encode NotFound }
 internalServerError InsertionError = do
-  liftIO . redMessage $ "[!]" <> "Could not insert incoming notification payload into database"
+  liftIO . redMessage $ "[!]" <> "Could not insert incoming notification payload into the database"
   throwError $ err500 { errBody = encode InsertionError }
+internalServerError TooManyResults = do
+  liftIO . redMessage $ "[!]" <> "Too many results for the database query"
+  throwError $ err500 { errBody = encode TooManyResults }

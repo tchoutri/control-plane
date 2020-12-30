@@ -10,7 +10,6 @@ module ControlPlane.DB.Types
   , createPool
   ) where
 
-import Data.UUID (UUID)
 import Data.Aeson (ToJSON (..), object)
 import Data.Pool                            (Pool, createPool)
 import Database.PostgreSQL.Simple           (ConnectInfo, Connection, close, connect)
@@ -21,7 +20,8 @@ type ConnectionPool = Pool Connection
 
 data InternalError
   = ConstraintFailure {-# UNPACK #-} Text
-  | NotificationNotFound {-# UNPACK #-} UUID
+  | NotFound
+  | TooManyResults
   | InsertionError
   deriving stock (Show, Generic)
 
@@ -29,5 +29,6 @@ instance Exception InternalError
 
 instance ToJSON InternalError where
   toJSON (ConstraintFailure msg)   = object [("error", "ConstraintFailure"), ("message", toJSON msg)]
-  toJSON (NotificationNotFound _) = object [("error", "NotificationNotFound"), ("message", "Notification not found ")]
   toJSON InsertionError = object [("error", "InsertionError"), ("message","Could not insert incoming notification payload into database")]
+  toJSON NotFound = object [("error", "NotFound"), ("message", "Not found")]
+  toJSON TooManyResults = object [("error", "TooManyResults"), ("message", "Too many results")]

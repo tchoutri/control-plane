@@ -1,7 +1,7 @@
 module ControlPlane.DB.Helpers where
 
 import Colourista.IO              (cyanMessage)
-import Control.Exception          (try)
+import Control.Exception          (try, throw)
 import Data.Pool
 import Data.Time
 import Database.PostgreSQL.Simple as PG
@@ -13,11 +13,22 @@ mkPool :: ConnectInfo -> Int -> NominalDiffTime -> Int -> IO ConnectionPool
 mkPool connectInfo subPools timeout connections = 
   createPool (connect connectInfo) close subPools timeout connections
 
-query :: (ToRow params, FromRow result) => ConnectionPool -> Query -> params -> IO (Either InternalError [result])
-query pool q params = do
+queryMany :: (ToRow params, FromRow result) => ConnectionPool -> Query -> params -> IO (Either InternalError [result])
+queryMany pool q params = do
   try . withResource pool $ \conn -> do
     logQueryFormat conn q params
     PG.query conn q params
+
+queryOne :: (ToRow params, FromRow result) => ConnectionPool -> Query -> params -> IO (Either InternalError (Only result))
+queryOne pool q params = do
+  try . withResource pool $ \conn -> do
+    logQueryFormat conn q params
+    transformToOnly <$> PG.query conn q params
+
+transformToOnly :: [a] -> Only a
+transformToOnly [a] = Only a
+transformToOnly []  = throw NotFound
+transformToOnly _   = throw TooManyResults
 
 execute :: (ToRow params) => ConnectionPool -> Query -> params -> IO (Either InternalError NoContent)
 execute pool q params =

@@ -90,6 +90,7 @@ library:
   - colourista
   - envparse
   - mtl
+  - password
   - postgresql-simple
   - postgresql-simple-migration
   - relude

@@ -13,8 +13,8 @@ import Database.PostgreSQL.Simple (Only (..))
 import Database.PostgreSQL.Simple.SqlQQ
 import Servant
 
-import ControlPlane.DB.Types
-import ControlPlane.DB.Helpers (query, execute)
+import ControlPlane.DB.Helpers (execute, queryMany, queryOne)
+import ControlPlane.DB.Types   (ConnectionPool, InternalError (..))
 
 newtype NotificationId = NotificationId { getNotificationId :: UUID }
   deriving stock (Eq, Generic)
@@ -26,8 +26,8 @@ data NotificationStatus
   deriving stock (Eq, Show)
 
 instance ToJSON NotificationStatus where
-  toJSON (NotificationRead ts) = object [("status", "Read"), ("readAt", toJSON ts)]
-  toJSON NotificationUnread    = object [("status", "Unread")]
+  toJSON (NotificationRead ts) = object [("status", "read"), ("readAt", toJSON ts)]
+  toJSON NotificationUnread    = object [("status", "unread")]
 
 data Notification
   = Notification { notificationId :: NotificationId
@@ -110,12 +110,12 @@ instance ToField NotificationStatusPayload where
 -- Request functions
 
 getNotifications :: ConnectionPool -> IO (Either InternalError [Notification])
-getNotifications pool = query pool q ()
+getNotifications pool = queryMany pool q ()
   where q = [sql| SELECT notification_id, device, title, message, received_at, status, read_at
                   FROM notifications |]
 
-getNotificationById :: ConnectionPool -> NotificationId -> IO (Either InternalError [Notification])
-getNotificationById pool notificationId = query pool q (Only notificationId)
+getNotificationById :: ConnectionPool -> NotificationId -> IO (Either InternalError (Only Notification))
+getNotificationById pool notificationId = queryOne pool q (Only notificationId)
   where q = [sql| SELECT notification_id, device, title, message, received_at, status, read_at
                   FROM notifications
                   WHERE notification_id = ? |]
@@ -127,10 +127,9 @@ insertNotification pool notification = execute pool q notification
                   VALUES (?,?,?,?,?,?,?) |]
 
 updateNotification :: ConnectionPool -> Notification -> IO (Either InternalError NoContent)
-updateNotification pool Notification{..} = do
-  execute pool q params
+updateNotification pool Notification{..} = execute pool q params
     where q = [sql| UPDATE notifications
-                    SET (status, read_at) = (?,?) 
+                    SET (status, read_at) (?,?) 
                     WHERE notification_id = (?)
                     |]
           params = case status of
