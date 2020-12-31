@@ -96,6 +96,7 @@ library:
   - relude
   - resource-pool
   - servant
+  - servant-auth-server
   - servant-server
   - text
   - time

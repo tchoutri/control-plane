@@ -69,7 +69,8 @@ hashPassword :: (MonadIO m) => Password -> m (PasswordHash Argon2)
 hashPassword = Argon2.hashPassword 
 
 validatePassword :: Password -> PasswordHash Argon2 -> Bool
-validatePassword inputPassword hashedPassword = Argon2.checkPassword inputPassword hashedPassword == PasswordCheckSuccess 
+validatePassword inputPassword hashedPassword =
+  Argon2.checkPassword inputPassword hashedPassword == PasswordCheckSuccess
 
 insertUser :: ConnectionPool -> User -> IO (Either InternalError NoContent)
 insertUser pool user = execute pool q user
@@ -82,6 +83,12 @@ getUserById pool userId = queryOne pool q (Only userId)
   where q = [sql| SELECT user_id, username, display_name, password, created_at, updated_at
                   FROM users
                   WHERE user_id = ? |]
+
+getUserByUsername :: ConnectionPool -> Text -> IO (Either InternalError (Only User))
+getUserByUsername pool username = queryOne pool q (Only username)
+  where q = [sql| SELECT user_id, username, display_name, password, created_at, updated_at
+                  FROM users
+                  WHERE username = ? |]
 
 deleteUser :: ConnectionPool -> UserId -> IO (Either InternalError NoContent)
 deleteUser pool userId = execute pool q (Only userId)

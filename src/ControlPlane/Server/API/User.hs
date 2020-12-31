@@ -25,9 +25,10 @@ type UsersRoutes = ToServantApi UsersRoutes'
 
 usersRoutesHandlers :: (MonadIO m, MonadError ServerError (ControlPlaneM m))
                     => UsersRoutes' (AsServerT (ControlPlaneM m))
-usersRoutesHandlers = UsersRoutes' { getUser = getUserHandler
-                                   , newUser = newUserHandler
-                                   }
+usersRoutesHandlers =
+  UsersRoutes' { getUser = getUserHandler
+               , newUser = newUserHandler
+               }
 
 getUserHandler :: (MonadIO m, (MonadError ServerError (ControlPlaneM m)))
                => UserId -> ControlPlaneM m UserInfo
@@ -35,7 +36,7 @@ getUserHandler userId = do
   pool <- asks pgPool
   result <- liftIO $ DB.getUserById pool userId
   case result of
-    Left err              -> internalServerError err
+    Left err          -> internalServerError err
     Right (Only user) -> pure $ toUserInfo user
 
 newUserHandler :: (MonadIO m, (MonadError ServerError (ControlPlaneM m)))
