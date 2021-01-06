@@ -6,7 +6,7 @@ extra-deps:
 - postgresql-simple-migration-0.1.15.0@sha256:0e24e96908430f5caf9c1c1d9ca7c5c108e4e0409a255e2cbd77e8cd252dbb02,3879
 
 ghc-options:
-  "$everything": -haddock
+  "$everything": -haddock -fwrite-ide-info -hiedir=.hie
 
 packages:
   - '.'

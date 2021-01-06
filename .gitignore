@@ -4,3 +4,4 @@
 deployments/prod.sh
 .envrc
 Session.vim
+/.hie
