@@ -7,6 +7,7 @@ import           Servant
 import           Servant.API.Generic
 import           Servant.Server.Generic
 
+import           ControlPlane.DB.Helpers         (runDB)
 import           ControlPlane.DB.User            (NewUser (..), User (..), UserId (..), UserInfo (..))
 import qualified ControlPlane.DB.User            as DB
 import           ControlPlane.Environment        (ControlPlaneEnv (..))
@@ -34,7 +35,7 @@ getUserHandler :: (MonadIO m, (MonadError ServerError (ControlPlaneM m)))
                => UserId -> ControlPlaneM m UserInfo
 getUserHandler userId = do
   pool <- asks pgPool
-  result <- liftIO $ DB.getUserById pool userId
+  result <- liftIO $ runDB pool (DB.getUserById userId)
   case result of
     Left err          -> internalServerError err
     Right (Only user) -> pure $ toUserInfo user
@@ -47,7 +48,7 @@ newUserHandler NewUser{..} = do
   timestamp      <- liftIO getCurrentTime
   userId         <- liftIO $ UserId <$> nextRandom
   let user = User{userId=userId, username=username, displayName=displayName, password=hashedPassword, createdAt=timestamp, updatedAt=timestamp}
-  result <- liftIO $ DB.insertUser pool user
+  result <- liftIO $ runDB pool (DB.insertUser user)
   case result of
     Left err -> internalServerError err
     Right _  -> getUserHandler userId

@@ -1,6 +1,6 @@
 module Main (main) where
 
-import ControlPlane.Server.API (startService)
+import ControlPlane.CLI (cliMain)
 
 main :: IO ()
-main = startService
+main = cliMain

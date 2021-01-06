@@ -1,5 +1,16 @@
 {-# LANGUAGE QuasiQuotes #-}
-module ControlPlane.DB.Notification where
+module ControlPlane.DB.Notification
+  ( Notification (..)
+  , NotificationId (..)
+  , NotificationStatus (..)
+  , NotificationPayload (..)
+  , NewStatusPayload (..)
+  , NotificationStatusPayload (..)
+  , getNotificationById
+  , insertNotification
+  , getNotifications
+  , updateNotification
+  ) where
 
 import Control.Exception
 import Data.Aeson
@@ -11,10 +22,11 @@ import Database.PostgreSQL.Simple.ToField   (Action (..), ToField (..))
 import Database.PostgreSQL.Simple.ToRow     (ToRow (..))
 import Database.PostgreSQL.Simple (Only (..))
 import Database.PostgreSQL.Simple.SqlQQ
+import Database.PostgreSQL.Transact (DBT)
 import Servant
 
 import ControlPlane.DB.Helpers (execute, queryMany, queryOne)
-import ControlPlane.DB.Types   (ConnectionPool, InternalError (..))
+import ControlPlane.DB.Types (InternalError (..))
 
 newtype NotificationId = NotificationId { getNotificationId :: UUID }
   deriving stock (Eq, Generic)
@@ -109,25 +121,25 @@ instance ToField NotificationStatusPayload where
 
 -- Request functions
 
-getNotifications :: ConnectionPool -> IO (Either InternalError [Notification])
-getNotifications pool = queryMany pool q ()
+getNotifications :: DBT IO [Notification]
+getNotifications = queryMany q ()
   where q = [sql| SELECT notification_id, device, title, message, received_at, status, read_at
                   FROM notifications |]
 
-getNotificationById :: ConnectionPool -> NotificationId -> IO (Either InternalError (Only Notification))
-getNotificationById pool notificationId = queryOne pool q (Only notificationId)
+getNotificationById :: NotificationId -> DBT IO (Only Notification)
+getNotificationById notificationId = queryOne q (Only notificationId)
   where q = [sql| SELECT notification_id, device, title, message, received_at, status, read_at
                   FROM notifications
                   WHERE notification_id = ? |]
 
-insertNotification :: ConnectionPool -> Notification -> IO (Either InternalError NoContent)
-insertNotification pool notification = execute pool q notification
+insertNotification :: Notification -> DBT IO NoContent
+insertNotification notification = execute q notification
   where q = [sql| INSERT INTO notifications 
                   (notification_id, device, title, message, received_at, status, read_at)
                   VALUES (?,?,?,?,?,?,?) |]
 
-updateNotification :: ConnectionPool -> Notification -> IO (Either InternalError NoContent)
-updateNotification pool Notification{..} = execute pool q params
+updateNotification :: Notification -> DBT IO NoContent
+updateNotification Notification{..} = execute q params
     where q = [sql| UPDATE notifications
                     SET (status, read_at) (?,?) 
                     WHERE notification_id = (?)

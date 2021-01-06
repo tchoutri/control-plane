@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 2c6d8ad0d606c24cded7c6143ed23d5fec117308ef35f2208899b7cce3b15204
+-- hash: 5e8b3ef24aaee8c6c97c766497353b4a541445dd9058e01b4f76c62f58c97e4c
 
 name:           control-plane
 version:        0.0.0
@@ -27,16 +27,22 @@ source-repository head
 
 library
   exposed-modules:
+      ControlPlane.CLI
       ControlPlane.DB.Helpers
+      ControlPlane.DB.Job
       ControlPlane.DB.Notification
       ControlPlane.DB.Types
       ControlPlane.DB.User
       ControlPlane.Environment
+      ControlPlane.Model.Job
       ControlPlane.Model.Notification
       ControlPlane.Model.User
+      ControlPlane.Server
       ControlPlane.Server.API
       ControlPlane.Server.API.Authentication
       ControlPlane.Server.API.Helpers
+      ControlPlane.Server.API.Jobs
+      ControlPlane.Server.API.Jobs.CheckWebsite
       ControlPlane.Server.API.Notification
       ControlPlane.Server.API.Types
       ControlPlane.Server.API.User
@@ -51,12 +57,17 @@ library
     , base-noprelude
     , colourista
     , envparse
+    , ki
+    , monad-control
     , mtl
+    , optparse-applicative
     , password
+    , pg-transact
     , postgresql-simple
     , postgresql-simple-migration
     , relude
     , resource-pool
+    , safe-exceptions
     , servant
     , servant-auth-server
     , servant-server
@@ -113,7 +124,9 @@ test-suite control-plane-test
   type: exitcode-stdio-1.0
   main-is: Main.hs
   other-modules:
-      Model.NotificationSpec
+      DB.Helpers
+      DB.Notification
+      Model.Notification
       Paths_control_plane
   hs-source-dirs:
       test
@@ -124,6 +137,10 @@ test-suite control-plane-test
     , base-noprelude
     , control-plane
     , hspec
+    , hspec-pg-transact
+    , pg-transact
+    , postgresql-simple
+    , postgresql-simple-migration
     , relude
     , string-qq
     , time

@@ -89,12 +89,17 @@ library:
   - base-noprelude
   - colourista
   - envparse
+  - ki
+  - monad-control
   - mtl
+  - optparse-applicative
   - password
+  - pg-transact
   - postgresql-simple
   - postgresql-simple-migration
   - relude
   - resource-pool
+  - safe-exceptions
   - servant
   - servant-auth-server
   - servant-server
@@ -141,6 +146,10 @@ tests:
     - base-noprelude
     - control-plane
     - hspec
+    - hspec-pg-transact
+    - pg-transact
+    - postgresql-simple
+    - postgresql-simple-migration
     - relude
     - string-qq
     - time

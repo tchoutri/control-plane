@@ -19,12 +19,30 @@ packages:
   original:
     hackage: envparse-0.4.1@sha256:989902e6368532548f61de1fa245ad2b39176cddd8743b20071af519a709ce30,2842
 - completed:
+    hackage: ki-0.2.0.1@sha256:009d881efa01dfcbe880e62dedb6d4160088220c453a900f7ce4ae17cc48d082,3690
+    pantry-tree:
+      size: 1226
+      sha256: 36a7bbc5fc608725a1df54edacfd5fb02c2caaddd9e71f5eb5a78c4ec2d31068
+  original:
+    hackage: ki-0.2.0.1@sha256:009d881efa01dfcbe880e62dedb6d4160088220c453a900f7ce4ae17cc48d082,3690
+- completed:
     hackage: postgresql-simple-migration-0.1.15.0@sha256:0e24e96908430f5caf9c1c1d9ca7c5c108e4e0409a255e2cbd77e8cd252dbb02,3879
     pantry-tree:
       size: 766
       sha256: c2843bfe43b804992bc913f33ec6b2c6cb0fc99c6d931b6ff85894e8aef9a99e
   original:
     hackage: postgresql-simple-migration-0.1.15.0@sha256:0e24e96908430f5caf9c1c1d9ca7c5c108e4e0409a255e2cbd77e8cd252dbb02,3879
+- completed:
+    name: hspec-pg-transact
+    version: 0.1.0.2
+    git: git@github.com:jfischoff/pg-transact-hspec
+    pantry-tree:
+      size: 423
+      sha256: acd9e900dc9606766ce05a2ebc8b3bb6f1420c35d04299d2b5ad9be1ac441a86
+    commit: 77e6a97e60838fcf5763310204b0a74835e4f1d5
+  original:
+    git: git@github.com:jfischoff/pg-transact-hspec
+    commit: 77e6a97e60838fcf5763310204b0a74835e4f1d5
 snapshots:
 - completed:
     size: 533252

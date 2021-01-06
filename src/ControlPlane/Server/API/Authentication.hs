@@ -8,11 +8,12 @@ import Servant.Server (BasicAuthCheck (..), BasicAuthResult (..))
 
 import ControlPlane.DB.Types
 import ControlPlane.DB.User  (User (..), validatePassword, getUserByUsername)
+import ControlPlane.DB.Helpers (runDB)
 
 loginCheck :: ConnectionPool -> BasicAuthCheck User
 loginCheck pool = BasicAuthCheck $ \basicAuthData -> do
   let username = decodeUtf8 . basicAuthUsername $ basicAuthData
-  result <- getUserByUsername pool username
+  result <- runDB pool $ getUserByUsername username
   case result of
     Left _ -> do
       redMessage $ "[AUTH] Authentication failed for user " <> username

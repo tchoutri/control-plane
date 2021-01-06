@@ -1,11 +1,11 @@
 module ControlPlane.Server.API.Helpers where
 
-import Control.Monad.Except (MonadError)
 import Colourista.IO
-import Data.Aeson    (encode)
-import Servant       (ServerError (..), err404, err500, throwError)
+import Control.Monad.Except         (MonadError)
+import Data.Aeson                   (encode)
+import Servant                      (ServerError (..), err404, err500, throwError)
 
-import ControlPlane.Server.API.Types
+import ControlPlane.Server.API.Types (InternalError (..), ControlPlaneM)
 
 internalServerError :: (MonadIO m, MonadError ServerError (ControlPlaneM m))
                     => InternalError -> ControlPlaneM m a

@@ -1,4 +1,8 @@
-module ControlPlane.Environment where
+module ControlPlane.Environment
+  ( ControlPlaneEnv (..)
+  , getConfig
+  , mkControlPlaneEnv
+  ) where
 
 import           Data.Time                  (NominalDiffTime)
 import qualified Database.PostgreSQL.Simple as PG
@@ -77,11 +81,11 @@ nonNegative nni =
   then Right nni
   else Left . unread . show $ nni
 
-bool :: Reader Error Bool
-bool b =
-  case readMaybe b of
-    Nothing -> Left . unread . show $ b
-    Just b' -> Right b'
+-- bool :: Reader Error Bool
+-- bool b =
+--   case readMaybe b of
+--     Nothing -> Left . unread . show $ b
+--     Just b' -> Right b'
 
 timeout :: Reader Error NominalDiffTime
 timeout t = second fromIntegral (int >=> nonNegative $ t)

@@ -13,11 +13,13 @@ import ControlPlane.Server.API.Authentication
 import ControlPlane.Server.API.Notification
 import ControlPlane.Server.API.Types
 import ControlPlane.Server.API.User
+import ControlPlane.Server.API.Jobs
 import ControlPlane.DB.User (User)
 
 data ControlPlaneRoutes mode
   = ControlPlaneRoutes { notifications :: mode :- BasicAuth "" User :> "notifications" :> NotificationsRoutes
                        , users         :: mode :- BasicAuth "" User :> "users" :> UsersRoutes
+                       , jobs          :: mode :- BasicAuth "" User :> "jobs" :> JobsRoutes
                        } deriving stock (Generic)
 
 type API = ToServantApi ControlPlaneRoutes
@@ -32,6 +34,7 @@ app env = genericServeTWithContext
     insertEnv s x = Handler . ExceptT . runControlPlaneM s $ x
     routesHandlers = ControlPlaneRoutes (\_ -> genericServerT notificationsRouteHandlers)
                                         (\_ -> genericServerT usersRoutesHandlers)
+                                        (\_ -> genericServerT jobsRoutesHandlers)
 
 appContext :: ControlPlaneEnv -> Context '[BasicAuthCheck User]
 appContext env = loginCheck (pgPool env) :. EmptyContext

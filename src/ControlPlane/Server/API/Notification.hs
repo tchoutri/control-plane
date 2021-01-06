@@ -12,11 +12,11 @@ import           Servant
 import           Servant.API.Generic
 import           Servant.Server.Generic
 
+import           ControlPlane.DB.Helpers         (runDB)
 import           ControlPlane.DB.Notification    (NewStatusPayload (..), Notification (..), NotificationId (..),
                                                   NotificationPayload (..), NotificationStatus (..),
                                                   NotificationStatusPayload (..))
 import qualified ControlPlane.DB.Notification    as DB
--- import           ControlPlane.DB.Types           ()
 import           ControlPlane.Environment        (ControlPlaneEnv (..))
 import           ControlPlane.Model.Notification (mkNotification)
 import           ControlPlane.Server.API.Helpers (internalServerError)
@@ -48,7 +48,7 @@ getAllNotifications :: (MonadIO m, (MonadError ServerError (ControlPlaneM m)))
                     => ControlPlaneM m [Notification]
 getAllNotifications = do
   pool <- asks pgPool
-  result <- liftIO $ DB.getNotifications pool
+  result <- liftIO $ runDB pool (DB.getNotifications)
   case result of
     Left err            -> internalServerError err
     Right notifications -> pure notifications
@@ -57,7 +57,7 @@ getNotificationById :: (MonadIO m, (MonadError ServerError (ControlPlaneM m)))
                     => NotificationId -> ControlPlaneM m Notification
 getNotificationById notificationId = do
   pool <- asks pgPool
-  result <- liftIO $ DB.getNotificationById pool notificationId
+  result <- liftIO $ runDB pool (DB.getNotificationById notificationId)
   case result of
     Left err  -> internalServerError err
     Right (Only n) -> pure n
@@ -67,7 +67,7 @@ postNotificationHandler :: (MonadIO m, (MonadError ServerError (ControlPlaneM m)
 postNotificationHandler payload = do
   pool <- asks pgPool
   notification <- mkNotification payload
-  result <- liftIO $ DB.insertNotification pool notification
+  result <- liftIO $ runDB pool $ DB.insertNotification notification
   case result of
     Left err -> internalServerError err
     Right _  -> pure NoContent
@@ -83,7 +83,7 @@ setNotificationStatusHandler notificationId NewStatusPayload{status=statusPayloa
         SetAsUnread -> NotificationUnread
   notification <- getNotificationById notificationId
   let newNotification = notification{status = newStatus} :: Notification
-  result <- liftIO $ DB.updateNotification pool newNotification
+  result <- liftIO $ runDB pool $ DB.updateNotification newNotification
   case result of
     Left err -> internalServerError err
     Right _  -> pure NoContent

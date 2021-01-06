@@ -16,11 +16,11 @@ import           Database.PostgreSQL.Simple.FromRow   (FromRow (..))
 import           Database.PostgreSQL.Simple.SqlQQ
 import           Database.PostgreSQL.Simple.ToField   (ToField (..))
 import           Database.PostgreSQL.Simple.ToRow     (ToRow (..))
+import Database.PostgreSQL.Transact (DBT)
 import           GHC.TypeLits                         (ErrorMessage (..), TypeError)
 import           Servant                              (FromHttpApiData, NoContent (..))
 
-import ControlPlane.DB.Helpers (execute, queryOne)
-import ControlPlane.DB.Types   (ConnectionPool, InternalError (..))
+import           ControlPlane.DB.Helpers              (execute, queryOne)
 
 newtype UserId = UserId { getUserId :: UUID }
   deriving stock (Eq, Generic)
@@ -72,25 +72,25 @@ validatePassword :: Password -> PasswordHash Argon2 -> Bool
 validatePassword inputPassword hashedPassword =
   Argon2.checkPassword inputPassword hashedPassword == PasswordCheckSuccess
 
-insertUser :: ConnectionPool -> User -> IO (Either InternalError NoContent)
-insertUser pool user = execute pool q user
+insertUser :: User -> DBT IO NoContent
+insertUser user = execute q user
   where q = [sql| INSERT INTO users
                   (user_id, username, display_name, password, created_at, updated_at)
                   VALUES (?,?,?,?,?,?) |]
 
-getUserById :: ConnectionPool -> UserId -> IO (Either InternalError (Only User))
-getUserById pool userId = queryOne pool q (Only userId)
+getUserById :: UserId -> DBT IO (Only User)
+getUserById userId = queryOne q (Only userId)
   where q = [sql| SELECT user_id, username, display_name, password, created_at, updated_at
                   FROM users
                   WHERE user_id = ? |]
 
-getUserByUsername :: ConnectionPool -> Text -> IO (Either InternalError (Only User))
-getUserByUsername pool username = queryOne pool q (Only username)
+getUserByUsername :: Text -> DBT IO (Only User)
+getUserByUsername username = queryOne q (Only username)
   where q = [sql| SELECT user_id, username, display_name, password, created_at, updated_at
                   FROM users
                   WHERE username = ? |]
 
-deleteUser :: ConnectionPool -> UserId -> IO (Either InternalError NoContent)
-deleteUser pool userId = execute pool q (Only userId)
+deleteUser :: UserId -> DBT IO NoContent
+deleteUser userId = execute q (Only userId)
   where q = [sql| DELETE FROM users
                   WHERE user_id = ? |]

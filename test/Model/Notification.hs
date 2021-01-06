@@ -1,5 +1,5 @@
 {-# LANGUAGE QuasiQuotes #-}
-module Model.NotificationSpec where
+module Model.Notification where
 
 import Test.Hspec
 import Data.UUID (nil)

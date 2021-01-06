@@ -3,7 +3,10 @@ resolver: lts-16.26
 extra-deps:
 - base-noprelude-4.13.0.0
 - envparse-0.4.1@sha256:989902e6368532548f61de1fa245ad2b39176cddd8743b20071af519a709ce30,2842
+- ki-0.2.0.1@sha256:009d881efa01dfcbe880e62dedb6d4160088220c453a900f7ce4ae17cc48d082,3690
 - postgresql-simple-migration-0.1.15.0@sha256:0e24e96908430f5caf9c1c1d9ca7c5c108e4e0409a255e2cbd77e8cd252dbb02,3879
+- git: git@github.com:jfischoff/pg-transact-hspec
+  commit: 77e6a97e60838fcf5763310204b0a74835e4f1d5
 
 ghc-options:
   "$everything": -haddock -fwrite-ide-info -hiedir=.hie
