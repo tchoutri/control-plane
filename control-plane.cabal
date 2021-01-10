@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 5e8b3ef24aaee8c6c97c766497353b4a541445dd9058e01b4f76c62f58c97e4c
+-- hash: f3436b813ad05f739e070429b99a68009add984c3cad236b356acdc5e1b66896
 
 name:           control-plane
 version:        0.0.0
@@ -38,26 +38,30 @@ library
       ControlPlane.Model.Notification
       ControlPlane.Model.User
       ControlPlane.Server
-      ControlPlane.Server.API
-      ControlPlane.Server.API.Authentication
-      ControlPlane.Server.API.Helpers
-      ControlPlane.Server.API.Jobs
-      ControlPlane.Server.API.Jobs.CheckWebsite
-      ControlPlane.Server.API.Notification
-      ControlPlane.Server.API.Types
-      ControlPlane.Server.API.User
+      ControlPlane.Web
+      ControlPlane.Web.Controller.Overview
+      ControlPlane.Web.Controller.Root
+      ControlPlane.Web.Router
+      ControlPlane.Web.Types
+      ControlPlane.Web.View.Base
+      ControlPlane.Web.View.Root
+      Network.Wai.Middleware.CSP
       Prelude
   other-modules:
       Paths_control_plane
   hs-source-dirs:
       src
-  default-extensions: ApplicativeDo BangPatterns ConstraintKinds DataKinds DefaultSignatures DeriveAnyClass DeriveFoldable DeriveFunctor DeriveGeneric DeriveLift DeriveTraversable DerivingStrategies DuplicateRecordFields EmptyCase ExistentialQuantification FlexibleContexts FlexibleInstances FunctionalDependencies GADTs GeneralizedNewtypeDeriving InstanceSigs KindSignatures LambdaCase MultiParamTypeClasses MultiWayIf NamedFieldPuns OverloadedStrings PatternSynonyms RankNTypes RecordWildCards ScopedTypeVariables StandaloneDeriving TupleSections TypeApplications TypeFamilies TypeFamilyDependencies TypeOperators
+  default-extensions: DataKinds DeriveAnyClass DeriveGeneric DerivingStrategies DuplicateRecordFields FlexibleContexts FlexibleInstances GADTs GeneralizedNewtypeDeriving MultiParamTypeClasses NamedFieldPuns OverloadedStrings RecordWildCards StandaloneDeriving TypeOperators
   build-depends:
-      aeson
+      Spock
+    , Spock-lucid
+    , aeson
     , base-noprelude
     , colourista
+    , directory
     , envparse
     , ki
+    , lucid
     , monad-control
     , mtl
     , optparse-applicative
@@ -68,34 +72,16 @@ library
     , relude
     , resource-pool
     , safe-exceptions
-    , servant
-    , servant-auth-server
-    , servant-server
     , text
     , time
     , unordered-containers
     , uuid
     , vector
     , wai
+    , wai-cors
+    , wai-extra
+    , wai-middleware-static
     , warp
-  if impl(ghc >= 8.4.4)
-    ghc-options: -Wall -Wcompat -Werror -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wpartial-fields -Wredundant-constraints -fhide-source-paths -Wno-unused-do-bind
-  else
-    ghc-options: -Wall -Wcompat -Werror -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wredundant-constraints -fhide-source-paths -Wno-unused-do-bind
-  default-language: Haskell2010
-
-executable control-plane-routes
-  main-is: Main.hs
-  other-modules:
-      Paths_control_plane
-  hs-source-dirs:
-      app/layout
-  default-extensions: ApplicativeDo BangPatterns ConstraintKinds DataKinds DefaultSignatures DeriveAnyClass DeriveFoldable DeriveFunctor DeriveGeneric DeriveLift DeriveTraversable DerivingStrategies DuplicateRecordFields EmptyCase ExistentialQuantification FlexibleContexts FlexibleInstances FunctionalDependencies GADTs GeneralizedNewtypeDeriving InstanceSigs KindSignatures LambdaCase MultiParamTypeClasses MultiWayIf NamedFieldPuns OverloadedStrings PatternSynonyms RankNTypes RecordWildCards ScopedTypeVariables StandaloneDeriving TupleSections TypeApplications TypeFamilies TypeFamilyDependencies TypeOperators
-  ghc-options: -rtsopts -threaded -with-rtsopts=-N
-  build-depends:
-      base-noprelude
-    , control-plane
-    , relude
   if impl(ghc >= 8.4.4)
     ghc-options: -Wall -Wcompat -Werror -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wpartial-fields -Wredundant-constraints -fhide-source-paths -Wno-unused-do-bind
   else
@@ -108,7 +94,7 @@ executable control-plane-server
       Paths_control_plane
   hs-source-dirs:
       app/server
-  default-extensions: ApplicativeDo BangPatterns ConstraintKinds DataKinds DefaultSignatures DeriveAnyClass DeriveFoldable DeriveFunctor DeriveGeneric DeriveLift DeriveTraversable DerivingStrategies DuplicateRecordFields EmptyCase ExistentialQuantification FlexibleContexts FlexibleInstances FunctionalDependencies GADTs GeneralizedNewtypeDeriving InstanceSigs KindSignatures LambdaCase MultiParamTypeClasses MultiWayIf NamedFieldPuns OverloadedStrings PatternSynonyms RankNTypes RecordWildCards ScopedTypeVariables StandaloneDeriving TupleSections TypeApplications TypeFamilies TypeFamilyDependencies TypeOperators
+  default-extensions: DataKinds DeriveAnyClass DeriveGeneric DerivingStrategies DuplicateRecordFields FlexibleContexts FlexibleInstances GADTs GeneralizedNewtypeDeriving MultiParamTypeClasses NamedFieldPuns OverloadedStrings RecordWildCards StandaloneDeriving TypeOperators
   ghc-options: -rtsopts -threaded -with-rtsopts=-N
   build-depends:
       base-noprelude
@@ -130,7 +116,7 @@ test-suite control-plane-test
       Paths_control_plane
   hs-source-dirs:
       test
-  default-extensions: ApplicativeDo BangPatterns ConstraintKinds DataKinds DefaultSignatures DeriveAnyClass DeriveFoldable DeriveFunctor DeriveGeneric DeriveLift DeriveTraversable DerivingStrategies DuplicateRecordFields EmptyCase ExistentialQuantification FlexibleContexts FlexibleInstances FunctionalDependencies GADTs GeneralizedNewtypeDeriving InstanceSigs KindSignatures LambdaCase MultiParamTypeClasses MultiWayIf NamedFieldPuns OverloadedStrings PatternSynonyms RankNTypes RecordWildCards ScopedTypeVariables StandaloneDeriving TupleSections TypeApplications TypeFamilies TypeFamilyDependencies TypeOperators
+  default-extensions: DataKinds DeriveAnyClass DeriveGeneric DerivingStrategies DuplicateRecordFields FlexibleContexts FlexibleInstances GADTs GeneralizedNewtypeDeriving MultiParamTypeClasses NamedFieldPuns OverloadedStrings RecordWildCards StandaloneDeriving TypeOperators
   build-depends:
       aeson
     , aeson-pretty

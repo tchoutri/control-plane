@@ -24,4 +24,4 @@ spec = describeDB migrate "Notification DB" $ do
   itDB "Insert notification" $ do
     insertNotification notification1
     result <- getNotificationById (notificationId notification1)
-    pure $ result `shouldBe` (Only notification1)
+    pure $ result `shouldBe` Only notification1

@@ -8,7 +8,6 @@ import Data.Pool                    (withResource)
 import Data.Time                    (NominalDiffTime)
 import Database.PostgreSQL.Simple   as PG
 import Database.PostgreSQL.Transact as PGT
-import Servant                      (NoContent (..))
 
 import ControlPlane.DB.Types
 
@@ -32,11 +31,11 @@ transformToOnly [r] = Only r
 transformToOnly []  = throw NotFound
 transformToOnly _   = throw TooManyResults
 
-execute :: (ToRow params, MonadIO m) => Query -> params -> DBT m NoContent
+execute :: (ToRow params, MonadIO m) => Query -> params -> DBT m ()
 execute q params = do
   logQueryFormat q params
   PGT.execute q params
-  pure NoContent
+  pure ()
 
 logQueryFormat :: (ToRow params, MonadIO m) => Query -> params -> DBT m ()
 logQueryFormat q params = do

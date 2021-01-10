@@ -1,6 +1,6 @@
 module ControlPlane.Server where
 
-import qualified ControlPlane.Server.API as API
+import ControlPlane.Web (startWebService)
 
 startService :: IO ()
-startService = API.startService
+startService = startWebService

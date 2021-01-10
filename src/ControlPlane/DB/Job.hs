@@ -3,7 +3,6 @@ module ControlPlane.DB.Job where
 
 import Data.Aeson
 import Data.Time
-import Servant
 import Database.PostgreSQL.Simple.FromField
 import Database.PostgreSQL.Simple.FromRow
 import Database.PostgreSQL.Simple.SqlQQ
@@ -13,7 +12,6 @@ import Database.PostgreSQL.Simple (Only (..))
 import Database.PostgreSQL.Transact (DBT)
 
 import ControlPlane.DB.Helpers 
-import ControlPlane.Server.API.Jobs.CheckWebsite
 
 data Job
   = Job { jobId     :: Maybe Int64
@@ -22,6 +20,10 @@ data Job
         , runDate   :: UTCTime
         } deriving stock (Eq, Show, Generic)
           deriving anyclass (FromJSON, ToJSON, FromRow)
+
+newtype Website = Website { url :: Text }
+  deriving stock (Eq, Show, Generic)
+  deriving newtype (FromJSON, ToJSON)
 
 data Payload = CheckWebsite Website
              | GrabJSON Text
@@ -55,7 +57,7 @@ getJobs currentTime = queryMany q (Only currentTime)
                   WHERE run_date <= ?
             |]
 
-createJob :: Job -> DBT IO NoContent
+createJob :: Job -> DBT IO ()
 createJob job = execute q job
   where q = [sql| INSERT INTO jobs
                   (payload, created_at, run_date)

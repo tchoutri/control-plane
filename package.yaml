@@ -19,42 +19,20 @@ extra-source-files:
 - stack.yaml
 
 default-extensions:
-  - ApplicativeDo
-  - BangPatterns
-  - ConstraintKinds
   - DataKinds
-  - DefaultSignatures
   - DeriveAnyClass
-  - DeriveFoldable
-  - DeriveFunctor
   - DeriveGeneric
-  - DeriveLift
-  - DeriveTraversable
   - DerivingStrategies
   - DuplicateRecordFields 
-  - EmptyCase
-  - ExistentialQuantification
   - FlexibleContexts
   - FlexibleInstances
-  - FunctionalDependencies
   - GADTs
   - GeneralizedNewtypeDeriving
-  - InstanceSigs
-  - KindSignatures
-  - LambdaCase
   - MultiParamTypeClasses
-  - MultiWayIf
   - NamedFieldPuns
   - OverloadedStrings
-  - PatternSynonyms
-  - RankNTypes
   - RecordWildCards
-  - ScopedTypeVariables
   - StandaloneDeriving
-  - TupleSections
-  - TypeApplications
-  - TypeFamilies
-  - TypeFamilyDependencies
   - TypeOperators
 
 when:
@@ -85,9 +63,12 @@ when:
 
 library:
   dependencies:
+  - Spock
+  - Spock-lucid
   - aeson
   - base-noprelude
   - colourista
+  - directory
   - envparse
   - ki
   - monad-control
@@ -100,30 +81,20 @@ library:
   - relude
   - resource-pool
   - safe-exceptions
-  - servant
-  - servant-auth-server
-  - servant-server
+  - lucid
   - text
   - time
   - unordered-containers
   - uuid
   - vector
   - wai
+  - wai-cors
+  - wai-extra
+  - wai-middleware-static
   - warp
   source-dirs: src
 
 executables:
-  control-plane-routes:
-    source-dirs: app/layout
-    main: Main.hs
-    dependencies:
-    - base-noprelude
-    - control-plane
-    - relude
-    ghc-options:
-    - -rtsopts
-    - -threaded
-    - -with-rtsopts=-N
   control-plane-server:
     source-dirs: app/server
     main: Main.hs

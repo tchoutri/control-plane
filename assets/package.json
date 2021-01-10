@@ -1,0 +1,27 @@
+{
+  "name": "frontend",
+  "scripts": {
+    "run": "yarn postcss -w css/style.css -o ../static/style.css"
+  },
+  "dependencies": {
+    "tailwindcss": "^2.0.2"
+  },
+  "devDependencies": {
+    "autoprefixer": "^10.2.1",
+    "parcel": "^2.0.0-beta.1",
+    "parcel-plugin-static-files-copy": "^2.5.0",
+    "postcss": "^8.2.4",
+    "postcss-cli": "^8.3.1",
+    "postcss-modules": "^4.0.0"
+  },
+  "staticFiles": {
+    "staticPath": "assets",
+    "watcherGlob": "**",
+    "outDirPattern": "static"
+  },
+  "source": "js/index.js",
+  "main": "../static/script.js",
+  "engines": {
+    "parcel": "2.x"
+  }
+}
