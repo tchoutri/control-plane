@@ -23,14 +23,13 @@ import Database.PostgreSQL.Simple.ToRow     (ToRow (..))
 import Database.PostgreSQL.Simple (Only (..))
 import Database.PostgreSQL.Simple.SqlQQ
 import Database.PostgreSQL.Transact (DBT)
-import Servant
 
 import ControlPlane.DB.Helpers (execute, queryMany, queryOne)
 import ControlPlane.DB.Types (InternalError (..))
 
 newtype NotificationId = NotificationId { getNotificationId :: UUID }
   deriving stock (Eq, Generic)
-  deriving newtype (Show, FromHttpApiData, FromJSON, ToJSON, FromField, ToField)
+  deriving newtype (Show, FromJSON, ToJSON, FromField, ToField)
 
 data NotificationStatus
   = NotificationRead UTCTime
@@ -132,13 +131,13 @@ getNotificationById notificationId = queryOne q (Only notificationId)
                   FROM notifications
                   WHERE notification_id = ? |]
 
-insertNotification :: Notification -> DBT IO NoContent
+insertNotification :: Notification -> DBT IO ()
 insertNotification notification = execute q notification
   where q = [sql| INSERT INTO notifications 
                   (notification_id, device, title, message, received_at, status, read_at)
                   VALUES (?,?,?,?,?,?,?) |]
 
-updateNotification :: Notification -> DBT IO NoContent
+updateNotification :: Notification -> DBT IO ()
 updateNotification Notification{..} = execute q params
     where q = [sql| UPDATE notifications
                     SET (status, read_at) (?,?) 

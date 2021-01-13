@@ -18,13 +18,12 @@ import           Database.PostgreSQL.Simple.ToField   (ToField (..))
 import           Database.PostgreSQL.Simple.ToRow     (ToRow (..))
 import Database.PostgreSQL.Transact (DBT)
 import           GHC.TypeLits                         (ErrorMessage (..), TypeError)
-import           Servant                              (FromHttpApiData, NoContent (..))
 
 import           ControlPlane.DB.Helpers              (execute, queryOne)
 
 newtype UserId = UserId { getUserId :: UUID }
   deriving stock (Eq, Generic)
-  deriving newtype (Show, FromHttpApiData, FromJSON, ToJSON, FromField, ToField)
+  deriving newtype (Show, FromJSON, ToJSON, FromField, ToField)
 
 data User
   = User { userId      :: UserId
@@ -72,7 +71,7 @@ validatePassword :: Password -> PasswordHash Argon2 -> Bool
 validatePassword inputPassword hashedPassword =
   Argon2.checkPassword inputPassword hashedPassword == PasswordCheckSuccess
 
-insertUser :: User -> DBT IO NoContent
+insertUser :: User -> DBT IO ()
 insertUser user = execute q user
   where q = [sql| INSERT INTO users
                   (user_id, username, display_name, password, created_at, updated_at)
@@ -90,7 +89,7 @@ getUserByUsername username = queryOne q (Only username)
                   FROM users
                   WHERE username = ? |]
 
-deleteUser :: UserId -> DBT IO NoContent
+deleteUser :: UserId -> DBT IO ()
 deleteUser userId = execute q (Only userId)
   where q = [sql| DELETE FROM users
                   WHERE user_id = ? |]

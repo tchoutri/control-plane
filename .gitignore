@@ -5,3 +5,6 @@ deployments/prod.sh
 .envrc
 Session.vim
 /.hie
+/static/*
+assets/node_modules
+assets/.parcel-cache
