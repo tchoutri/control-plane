@@ -16,10 +16,10 @@ import           Database.PostgreSQL.Simple.FromRow   (FromRow (..))
 import           Database.PostgreSQL.Simple.SqlQQ
 import           Database.PostgreSQL.Simple.ToField   (ToField (..))
 import           Database.PostgreSQL.Simple.ToRow     (ToRow (..))
-import Database.PostgreSQL.Transact (DBT)
+import           Database.PostgreSQL.Transact         (DBT)
 import           GHC.TypeLits                         (ErrorMessage (..), TypeError)
 
-import           ControlPlane.DB.Helpers              (execute, queryOne)
+import           ControlPlane.DB.Helpers              
 
 newtype UserId = UserId { getUserId :: UUID }
   deriving stock (Eq, Generic)
@@ -72,24 +72,24 @@ validatePassword inputPassword hashedPassword =
   Argon2.checkPassword inputPassword hashedPassword == PasswordCheckSuccess
 
 insertUser :: User -> DBT IO ()
-insertUser user = execute q user
+insertUser user = execute Insert q user
   where q = [sql| INSERT INTO users
                   (user_id, username, display_name, password, created_at, updated_at)
                   VALUES (?,?,?,?,?,?) |]
 
-getUserById :: UserId -> DBT IO (Only User)
-getUserById userId = queryOne q (Only userId)
+getUserById :: UserId -> DBT IO User
+getUserById userId = queryOne Select q (Only userId)
   where q = [sql| SELECT user_id, username, display_name, password, created_at, updated_at
                   FROM users
                   WHERE user_id = ? |]
 
-getUserByUsername :: Text -> DBT IO (Only User)
-getUserByUsername username = queryOne q (Only username)
+getUserByUsername :: Text -> DBT IO User
+getUserByUsername username = queryOne Select q (Only username)
   where q = [sql| SELECT user_id, username, display_name, password, created_at, updated_at
                   FROM users
                   WHERE username = ? |]
 
 deleteUser :: UserId -> DBT IO ()
-deleteUser userId = execute q (Only userId)
+deleteUser userId = execute Delete q (Only userId)
   where q = [sql| DELETE FROM users
                   WHERE user_id = ? |]

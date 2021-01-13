@@ -1,9 +1,10 @@
 module ControlPlane.Web where
 
-import Prelude          hiding (get)
+import Colourista.IO
+import Database.PostgreSQL.Simple (Connection)
+import Prelude                    hiding (get)
 import Web.Spock
 import Web.Spock.Config
-import Database.PostgreSQL.Simple (Connection)
 
 import ControlPlane.Environment
 import ControlPlane.Web.Router
@@ -11,6 +12,7 @@ import ControlPlane.Web.Types
 
 startWebService :: IO ()
 startWebService = do
+  greenMessage "[+] Starting web server"
   s <- newEmptyMVar
   env <- mkControlPlaneEnv
   config <- defaultSpockCfg EmptySession (PCPool (pgPool env)) (AppState s)

@@ -66,11 +66,11 @@ library:
   - Spock
   - Spock-lucid
   - aeson
+  - async
   - base-noprelude
   - colourista
   - directory
   - envparse
-  - ki
   - monad-control
   - mtl
   - optparse-applicative

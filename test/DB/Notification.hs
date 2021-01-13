@@ -1,11 +1,9 @@
 module DB.Notification where
 
-import Database.PostgreSQL.Simple   (Only (..))
 import Relude.Unsafe                (read)
 import Test.Hspec
 import Test.Hspec.DB
 
--- import ControlPlane.DB.Helpers
 import ControlPlane.DB.Notification (Notification (..), NotificationId (..), NotificationStatus (..), getNotificationById, insertNotification)
 import DB.Helpers
 
@@ -24,4 +22,4 @@ spec = describeDB migrate "Notification DB" $ do
   itDB "Insert notification" $ do
     insertNotification notification1
     result <- getNotificationById (notificationId notification1)
-    pure $ result `shouldBe` Only notification1
+    pure $ result `shouldBe` notification1
