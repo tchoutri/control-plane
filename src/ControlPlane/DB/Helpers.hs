@@ -1,6 +1,6 @@
 module ControlPlane.DB.Helpers where
 
-import Colourista.IO                (cyanMessage)
+import Colourista.IO                (cyanMessage, redMessage, yellowMessage)
 import Control.Exception            (throw)
 import Control.Exception.Safe       (MonadCatch, try)
 import Control.Monad.Trans.Control  (MonadBaseControl)
@@ -11,37 +11,49 @@ import Database.PostgreSQL.Transact as PGT
 
 import ControlPlane.DB.Types
 
+data QueryNature = Select | Insert | Update | Delete
+  deriving (Show, Eq)
+
 mkPool :: ConnectInfo -> Int -> NominalDiffTime -> Int -> IO ConnectionPool
 mkPool connectInfo subPools timeout connections = 
   createPool (connect connectInfo) close subPools timeout connections
 
-queryMany :: (ToRow params, FromRow result, MonadIO m) => Query -> params -> DBT m [result]
-queryMany q params = do
-    logQueryFormat q params
+queryMany :: (ToRow params, FromRow result, MonadIO m)
+          => QueryNature -> Query -> params -> DBT m [result]
+queryMany queryNature q params = do
+    logQueryFormat queryNature q params
     PGT.query q params
 
-queryOne :: (ToRow params, FromRow result, MonadIO m) => Query -> params -> DBT m (Only result)
-queryOne q params = do
-  logQueryFormat q params
+queryOne :: (ToRow params, FromRow result, MonadIO m)
+         => QueryNature -> Query -> params -> DBT m result
+queryOne queryNature q params = do
+  logQueryFormat queryNature q params
   result <- PGT.query q params
-  pure $ transformToOnly result
+  pure $ listToOne result
 
-transformToOnly :: [result] -> Only result
-transformToOnly [r] = Only r
-transformToOnly []  = throw NotFound
-transformToOnly _   = throw TooManyResults
+listToOne :: [result] -> result
+listToOne [r] = r
+listToOne []  = throw NotFound
+listToOne _   = throw TooManyResults
 
-execute :: (ToRow params, MonadIO m) => Query -> params -> DBT m ()
-execute q params = do
-  logQueryFormat q params
+maybeToOnly :: Maybe result -> Only result
+maybeToOnly (Just result) = Only result
+maybeToOnly Nothing       = throw NotFound
+
+execute :: (ToRow params, MonadIO m) => QueryNature -> Query -> params -> DBT m ()
+execute queryNature q params = do
+  logQueryFormat queryNature q params
   PGT.execute q params
   pure ()
 
-logQueryFormat :: (ToRow params, MonadIO m) => Query -> params -> DBT m ()
-logQueryFormat q params = do
+logQueryFormat :: (ToRow params, MonadIO m) => QueryNature -> Query -> params -> DBT m ()
+logQueryFormat queryNature q params = do
   msg <- PGT.formatQuery q params
-  liftIO $ cyanMessage $ "[QUERY] " <> decodeUtf8 msg
-  pure ()
+  case queryNature of
+    Select -> liftIO $ cyanMessage $ "[SELECT] " <> decodeUtf8 msg
+    Update -> liftIO $ yellowMessage $ "[UPDATE] " <> decodeUtf8 msg
+    Insert -> liftIO $ yellowMessage $ "[INSERT] " <> decodeUtf8 msg
+    Delete -> liftIO $ redMessage $ "[DELETE] " <> decodeUtf8 msg
 
 runDB :: (MonadCatch m, MonadBaseControl IO m) => ConnectionPool -> DBT m a -> m (Either InternalError a)
 runDB pool action = try $ withResource pool $ runDBTSerializable action

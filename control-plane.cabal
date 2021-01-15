@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: f3436b813ad05f739e070429b99a68009add984c3cad236b356acdc5e1b66896
+-- hash: f9291d300451bbd164f130d34df35761966065c3ff7e4ae809bab030d7b8c677
 
 name:           control-plane
 version:        0.0.0
@@ -34,6 +34,8 @@ library
       ControlPlane.DB.Types
       ControlPlane.DB.User
       ControlPlane.Environment
+      ControlPlane.Job
+      ControlPlane.Job.Runner
       ControlPlane.Model.Job
       ControlPlane.Model.Notification
       ControlPlane.Model.User
@@ -56,11 +58,11 @@ library
       Spock
     , Spock-lucid
     , aeson
+    , async
     , base-noprelude
     , colourista
     , directory
     , envparse
-    , ki
     , lucid
     , monad-control
     , mtl
@@ -111,6 +113,7 @@ test-suite control-plane-test
   main-is: Main.hs
   other-modules:
       DB.Helpers
+      DB.Job
       DB.Notification
       Model.Notification
       Paths_control_plane

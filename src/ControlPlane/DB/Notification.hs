@@ -16,16 +16,16 @@ import Control.Exception
 import Data.Aeson
 import Data.Time
 import Data.UUID                            (UUID)
+import Database.PostgreSQL.Simple           (Only (..))
 import Database.PostgreSQL.Simple.FromField (FromField (..), ResultError (..), returnError)
 import Database.PostgreSQL.Simple.FromRow   (FromRow (..))
+import Database.PostgreSQL.Simple.SqlQQ
 import Database.PostgreSQL.Simple.ToField   (Action (..), ToField (..))
 import Database.PostgreSQL.Simple.ToRow     (ToRow (..))
-import Database.PostgreSQL.Simple (Only (..))
-import Database.PostgreSQL.Simple.SqlQQ
-import Database.PostgreSQL.Transact (DBT)
+import Database.PostgreSQL.Transact         (DBT)
 
-import ControlPlane.DB.Helpers (execute, queryMany, queryOne)
-import ControlPlane.DB.Types (InternalError (..))
+import ControlPlane.DB.Helpers
+import ControlPlane.DB.Types   (InternalError (..))
 
 newtype NotificationId = NotificationId { getNotificationId :: UUID }
   deriving stock (Eq, Generic)
@@ -121,24 +121,24 @@ instance ToField NotificationStatusPayload where
 -- Request functions
 
 getNotifications :: DBT IO [Notification]
-getNotifications = queryMany q ()
+getNotifications = queryMany Select q ()
   where q = [sql| SELECT notification_id, device, title, message, received_at, status, read_at
                   FROM notifications |]
 
-getNotificationById :: NotificationId -> DBT IO (Only Notification)
-getNotificationById notificationId = queryOne q (Only notificationId)
+getNotificationById :: NotificationId -> DBT IO Notification
+getNotificationById notificationId = queryOne Select q (Only notificationId)
   where q = [sql| SELECT notification_id, device, title, message, received_at, status, read_at
                   FROM notifications
                   WHERE notification_id = ? |]
 
 insertNotification :: Notification -> DBT IO ()
-insertNotification notification = execute q notification
+insertNotification notification = execute Insert q notification
   where q = [sql| INSERT INTO notifications 
                   (notification_id, device, title, message, received_at, status, read_at)
                   VALUES (?,?,?,?,?,?,?) |]
 
 updateNotification :: Notification -> DBT IO ()
-updateNotification Notification{..} = execute q params
+updateNotification Notification{..} = execute Update q params
     where q = [sql| UPDATE notifications
                     SET (status, read_at) (?,?) 
                     WHERE notification_id = (?)

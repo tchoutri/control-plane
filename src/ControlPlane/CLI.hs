@@ -4,7 +4,6 @@ import           Colourista.IO              (greenMessage, redMessage)
 import qualified Data.Password.Argon2       as Argon2
 import           Data.Time
 import           Data.UUID.V4
-import           Database.PostgreSQL.Simple (Only (..))
 import           Options.Applicative
 
 import           ControlPlane.DB.Helpers  (runDB)
@@ -77,5 +76,5 @@ deleteUser username = do
   let pool = pgPool env
   result <- runDB pool $ DB.getUserByUsername username
   case result of
-    Right (Only user) -> void $ runDB pool $ DB.deleteUser (userId user)
-    Left  err         -> redMessage $ "[!] Could not delete user. " <> show err
+    Right user -> void $ runDB pool $ DB.deleteUser (userId user)
+    Left  err  -> redMessage $ "[!] Could not delete user. " <> show err
