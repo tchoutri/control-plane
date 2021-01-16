@@ -52,6 +52,12 @@ instance FromField Payload where
 instance ToRow Job where
   toRow Job{..} = toRow (payload, createdAt, runDate, lockedAt, attempts)
 
+getAllJobs :: DBT IO [Job]
+getAllJobs = queryMany Select q ()
+  where q = [sql| SELECT id, payload, created_at, run_date, locked_at, attempts
+                  FROM jobs
+            |]
+
 getJobs :: UTCTime -> DBT IO [Job]
 getJobs currentTime = queryMany Select q (Only currentTime)
   where q = [sql| SELECT id, payload, created_at, run_date, locked_at, attempts
