@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: f9291d300451bbd164f130d34df35761966065c3ff7e4ae809bab030d7b8c677
+-- hash: 466f5f00855b062a783bd27406e48dc89151a247e62a94e935e25fc1ae564205
 
 name:           control-plane
 version:        0.0.0
@@ -43,6 +43,7 @@ library
       ControlPlane.Web
       ControlPlane.Web.Controller.Overview
       ControlPlane.Web.Controller.Root
+      ControlPlane.Web.Errors
       ControlPlane.Web.Router
       ControlPlane.Web.Types
       ControlPlane.Web.View.Base
@@ -55,14 +56,13 @@ library
       src
   default-extensions: DataKinds DeriveAnyClass DeriveGeneric DerivingStrategies DuplicateRecordFields FlexibleContexts FlexibleInstances GADTs GeneralizedNewtypeDeriving MultiParamTypeClasses NamedFieldPuns OverloadedStrings RecordWildCards StandaloneDeriving TypeOperators
   build-depends:
-      Spock
-    , Spock-lucid
-    , aeson
+      aeson
     , async
     , base-noprelude
     , colourista
     , directory
     , envparse
+    , http-types
     , lucid
     , monad-control
     , mtl
@@ -74,6 +74,7 @@ library
     , relude
     , resource-pool
     , safe-exceptions
+    , scotty
     , text
     , time
     , unordered-containers

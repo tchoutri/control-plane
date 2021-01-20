@@ -1,7 +1,7 @@
 {
   "name": "frontend",
   "scripts": {
-    "run": "yarn postcss -w css/style.css -o ../static/style.css"
+    "watch-build": "yarn postcss -w css/style.css -o ../static/style.css"
   },
   "dependencies": {
     "tailwindcss": "^2.0.2"

@@ -1,10 +1,9 @@
 module ControlPlane.Web.Controller.Overview where
 
+import Web.Scotty.Trans
 import Lucid
-import Web.Spock       (ActionCtxT)
-import Web.Spock.Lucid (lucid)
 
 import ControlPlane.Web.View.Base
 
-handler :: (MonadIO m) => ActionCtxT ctx m a
-handler = lucid $ template $ h1_ "System Overview" 
+handler :: (Monad m, ScottyError e) => ActionT e m ()
+handler = html $ renderText $ template $ h1_ "System Overview" 

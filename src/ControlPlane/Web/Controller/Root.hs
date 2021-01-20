@@ -1,10 +1,20 @@
 module ControlPlane.Web.Controller.Root 
   ( handler) where
 
-import Web.Spock       (ActionCtxT)
-import Web.Spock.Lucid (lucid)
+import Lucid
+import Web.Scotty.Trans
 
+import ControlPlane.DB.Helpers
+import ControlPlane.DB.Job
+import ControlPlane.Environment
+import ControlPlane.Web.Types
 import ControlPlane.Web.View.Root (view)
+import ControlPlane.Web.Errors
 
-handler :: (MonadIO m) => ActionCtxT ctx m a
-handler = lucid view
+handler :: ActionT LText ControlPlaneM ()
+handler = do
+  pool <- asks pgPool
+  result <- liftIO $ runDB pool getAllJobs
+  case result of
+    Right jobs  -> html $ renderText $ view jobs
+    Left errMsg -> err500 (show errMsg)

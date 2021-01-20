@@ -63,14 +63,14 @@ when:
 
 library:
   dependencies:
-  - Spock
-  - Spock-lucid
   - aeson
   - async
   - base-noprelude
   - colourista
   - directory
   - envparse
+  - http-types
+  - lucid
   - monad-control
   - mtl
   - optparse-applicative
@@ -81,7 +81,7 @@ library:
   - relude
   - resource-pool
   - safe-exceptions
-  - lucid
+  - scotty
   - text
   - time
   - unordered-containers
