@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 466f5f00855b062a783bd27406e48dc89151a247e62a94e935e25fc1ae564205
+-- hash: d7add8c27ddde1c2252e0669eefb36d35d8467b28f790cf3324d0dc15e4bd36d
 
 name:           control-plane
 version:        0.0.0
@@ -40,7 +40,12 @@ library
       ControlPlane.Model.Notification
       ControlPlane.Model.User
       ControlPlane.Server
+      ControlPlane.TUI
+      ControlPlane.TUI.UI
       ControlPlane.Web
+      ControlPlane.Web.API.Error
+      ControlPlane.Web.API.Helpers
+      ControlPlane.Web.Controller.API
       ControlPlane.Web.Controller.Overview
       ControlPlane.Web.Controller.Root
       ControlPlane.Web.Errors
@@ -59,6 +64,7 @@ library
       aeson
     , async
     , base-noprelude
+    , brick
     , colourista
     , directory
     , envparse
@@ -85,6 +91,24 @@ library
     , wai-extra
     , wai-middleware-static
     , warp
+  if impl(ghc >= 8.4.4)
+    ghc-options: -Wall -Wcompat -Werror -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wpartial-fields -Wredundant-constraints -fhide-source-paths -Wno-unused-do-bind
+  else
+    ghc-options: -Wall -Wcompat -Werror -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wredundant-constraints -fhide-source-paths -Wno-unused-do-bind
+  default-language: Haskell2010
+
+executable control-plane
+  main-is: Main.hs
+  other-modules:
+      Paths_control_plane
+  hs-source-dirs:
+      app/tui
+  default-extensions: DataKinds DeriveAnyClass DeriveGeneric DerivingStrategies DuplicateRecordFields FlexibleContexts FlexibleInstances GADTs GeneralizedNewtypeDeriving MultiParamTypeClasses NamedFieldPuns OverloadedStrings RecordWildCards StandaloneDeriving TypeOperators
+  ghc-options: -rtsopts -threaded -with-rtsopts=-N
+  build-depends:
+      base-noprelude
+    , control-plane
+    , relude
   if impl(ghc >= 8.4.4)
     ghc-options: -Wall -Wcompat -Werror -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wpartial-fields -Wredundant-constraints -fhide-source-paths -Wno-unused-do-bind
   else

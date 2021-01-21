@@ -23,6 +23,7 @@ data InternalError
   | NotFound
   | TooManyResults
   | InsertionError
+  | DeserialisationError {-# UNPACK #-} Text
   deriving stock (Show, Generic)
 
 instance Exception InternalError
@@ -32,3 +33,4 @@ instance ToJSON InternalError where
   toJSON InsertionError = object [("error", "InsertionError"), ("message","Could not insert incoming notification payload into database")]
   toJSON NotFound = object [("error", "NotFound"), ("message", "Not found")]
   toJSON TooManyResults = object [("error", "TooManyResults"), ("message", "Too many results")]
+  toJSON (DeserialisationError param) = object [("error", "DeserialisationError"), ("message", toJSON $ "Could not deserialise parameter" <> param <> " to the expected format")]

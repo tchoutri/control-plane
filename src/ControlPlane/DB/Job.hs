@@ -70,7 +70,7 @@ getRunningJobs = queryMany Select q ()
   where q = [sql| SELECT id, payload, created_at, run_date, locked_at, attempts
                   FROM jobs
                   WHERE locked_at IS NOT NULL
-        |]
+            |]
 
 createJob :: Job -> DBT IO (Only Int)
 createJob job = queryOne Insert q job
@@ -84,4 +84,11 @@ deleteJob :: Int -> DBT IO ()
 deleteJob jobId = execute Delete q (Only jobId)
   where q = [sql| DELETE FROM jobs
                   WHERE id = ?
-              |]
+            |]
+
+getJob :: Int -> DBT IO Job
+getJob jobId = queryOne Select q (Only jobId)
+  where q = [sql| SELECT id, payload, created_at, run_date, locked_at, attempts
+                  FROM jobs
+                  WHERE id = ?
+            |]

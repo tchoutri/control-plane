@@ -66,6 +66,7 @@ library:
   - aeson
   - async
   - base-noprelude
+  - brick
   - colourista
   - directory
   - envparse
@@ -97,6 +98,17 @@ library:
 executables:
   control-plane-server:
     source-dirs: app/server
+    main: Main.hs
+    dependencies:
+    - base-noprelude
+    - control-plane
+    - relude
+    ghc-options:
+    - -rtsopts
+    - -threaded
+    - -with-rtsopts=-N
+  control-plane:
+    source-dirs: app/tui
     main: Main.hs
     dependencies:
     - base-noprelude
