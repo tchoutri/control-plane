@@ -13,24 +13,25 @@ to build it, as well as the Nix package manager to handle external dependencies.
 To build the backend without optimisations, run:
 
 ```bash
-$ stack build --fast
+$ cabal build
 ```
 
 or, to enable optimisations
 
 ```bash
-$ stack build --ghc-options="-O2"
+$ cabal build -O2
 ```
 
 ## Run
 
 You will need a PostgreSQL 12 database or higher.
-Please configure the environment variables in the appropriate source file in `./deployment`.
+Please configure the environment variables in the appropriate source file in `./deployment`
+and source the file in your environment.
 
 To launch the server, run 
 
 ```bash
-$ stack run -- control-plane-server
+$ cabal exec -- control-plane-server start
 ```
 
 ## Feature map
