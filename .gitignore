@@ -8,3 +8,4 @@ Session.vim
 /static/*
 assets/node_modules
 assets/.parcel-cache
+dist-newstyle
