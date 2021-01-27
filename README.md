@@ -1,4 +1,4 @@
-# Control Plane ![Simple Haskell][Simple Haskell]
+# Control Plane ![Simple Haskell][Simple Haskell] [![GitHub CI](https://github.com/tchoutri/control-plane/workflows/CI/badge.svg)][GitHub Action]
 
 ## Description
 
@@ -50,3 +50,4 @@ $ cabal exec -- control-plane-server start
 * Backed by `odd-jobs` + postgresql
 
 [Simple Haskell]: https://www.simplehaskell.org/badges/badge2.svg
+[GitHub Action]: https://github.com/tchoutri/control-plane/actions
