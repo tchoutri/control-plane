@@ -1,15 +1,16 @@
 module Job.Model where
 
-import Data.Time (getCurrentTime, UTCTime)
 import Data.Aeson (FromJSON)
+import Data.Time (UTCTime, getCurrentTime)
 
 import Job.DB (Job (..), Payload)
 
 data JobInfo
   = JobInfo { newPayload :: Payload
             , newRunDate :: UTCTime
-            } deriving stock (Eq, Show, Generic)
-              deriving anyclass (FromJSON)
+            }
+  deriving stock (Eq, Generic, Show)
+  deriving anyclass (FromJSON)
 
 mkJob :: JobInfo -> IO Job
 mkJob JobInfo{..} = do

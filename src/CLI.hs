@@ -1,22 +1,24 @@
 module CLI where
 
-import           Colourista.IO              (greenMessage, redMessage)
-import qualified Data.Password.Argon2       as Argon2
-import           Data.Time
-import           Data.UUID.V4
-import           Options.Applicative
+import Colourista.IO (greenMessage, redMessage)
+import qualified Data.Password.Argon2 as Argon2
+import Data.Time
+import Data.UUID.V4
 import Database.PostgreSQL.Entity.DBT
+import Options.Applicative
 
-import           DB.User     (NewUser (..), User (..), UserId (..))
-import qualified DB.User     as DB
-import           Environment (ControlPlaneEnv (..), mkEnv)
+import DB.User (NewUser (..), User (..), UserId (..))
+import qualified DB.User as DB
+import Environment (ControlPlaneEnv (..), mkEnv)
 import qualified Server
 
-newtype Options = Options Command
+newtype Options
+  = Options Command
 
-data Command = AddUser Text Text Text
-             | DeleteUser Text
-             | StartServer
+data Command
+  = AddUser Text Text Text
+  | DeleteUser Text
+  | StartServer
 
 cliMain :: IO ()
 cliMain = runOptions =<< execParser (parseOptions `withInfo` "CLI tool for control-plane")
@@ -25,13 +27,13 @@ parseOptions :: Parser Options
 parseOptions = Options <$> parseCommand
 
 parseCommand :: Parser Command
-parseCommand = subparser $ 
+parseCommand = subparser $
      command "add-user" (parseAddUser `withInfo` "Add a user to the database")
   <> command "delete-user" (parseDeleteUser `withInfo` "Delete a user from the database")
   <> command "start" (parseStart `withInfo` "Start control-plane")
 
 parseAddUser :: Parser Command
-parseAddUser = 
+parseAddUser =
   AddUser <$> argument str (metavar "USERNAME")
           <*> argument str (metavar "DISPLAYNAME")
           <*> argument str (metavar "PASSWORD")

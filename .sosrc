@@ -1,4 +1,4 @@
 - pattern: src/(.*)\.hs
   commands:
-  - stack build --fast
-  - stack exec -- control-plane-server start
+  - cabal test -j10
+  - ./start-tmux.sh

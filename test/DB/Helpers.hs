@@ -1,6 +1,6 @@
 module DB.Helpers where
 
-import Database.PostgreSQL.Simple           (Connection)
+import Database.PostgreSQL.Simple (Connection)
 import Database.PostgreSQL.Simple.Migration
 
 migrate :: Connection -> IO ()

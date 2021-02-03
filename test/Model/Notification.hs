@@ -1,11 +1,11 @@
 {-# LANGUAGE QuasiQuotes #-}
 module Model.Notification where
 
-import Test.Hspec
-import Data.UUID (nil)
-import Data.Maybe (fromJust)
 import Data.Aeson.Encode.Pretty
+import Data.Maybe (fromJust)
 import Data.String.QQ
+import Data.UUID (nil)
+import Test.Hspec
 
 import DB.Notification
 

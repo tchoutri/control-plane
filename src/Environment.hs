@@ -1,3 +1,4 @@
+{-# LANGUAGE StrictData #-}
 module Environment
   ( ControlPlaneEnv (..)
   , getConfig
@@ -5,25 +6,27 @@ module Environment
   , module Environment.Has
   ) where
 
-import           Data.Time (NominalDiffTime)
-import           Database.PostgreSQL.Entity.DBT (ConnectionPool, mkPool)
+import Data.Time (NominalDiffTime)
+import Database.PostgreSQL.Entity.DBT (ConnectionPool, mkPool)
 import qualified Database.PostgreSQL.Simple as PG
-import           Env (AsUnread (unread), Error, Parser, Reader, help, parse, str, var)
-import           Prelude hiding (Reader)
+import Env (AsUnread (unread), Error, Parser, Reader, help, parse, str, var)
+import Prelude hiding (Reader)
 
 import Environment.Has (Field (..), Has (..), grab)
 
 -- *Env datatypes are parsed as-is from the outside
 data Config
   = Config { pgConfig   :: PG.ConnectInfo
-                       , poolConfig :: PoolConfig
-                       } deriving (Show)
+           , poolConfig :: PoolConfig
+           }
+  deriving (Show)
 
 data PoolConfig
   = PoolConfig { subPools          :: Int
                , connectionTimeout :: NominalDiffTime
                , connections       :: Int
-               } deriving (Show)
+               }
+  deriving (Show)
 
 getConfig :: IO Config
 getConfig = Env.parse id parseConfig
@@ -49,9 +52,9 @@ parsePoolConfig =
 
 -- *Env datatypes are the ones that are passed in the application
 newtype ControlPlaneEnv
-  = ControlPlaneEnv { pgPool :: ConnectionPool
-                    } deriving stock (Show)
-                      deriving (Has ConnectionPool) via Field "pgPool" ControlPlaneEnv
+  = ControlPlaneEnv { pgPool :: ConnectionPool }
+  deriving stock (Show)
+  deriving (Has ConnectionPool) via Field "pgPool" ControlPlaneEnv
 
 mkEnv :: IO ControlPlaneEnv
 mkEnv = do

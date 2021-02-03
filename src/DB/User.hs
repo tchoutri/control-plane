@@ -1,28 +1,28 @@
 {-# LANGUAGE DerivingVia #-}
 {-# LANGUAGE OverloadedLists #-}
-{-# LANGUAGE QuasiQuotes #-}
 {-# LANGUAGE UndecidableInstances #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 
 module DB.User where
 
-import           Data.Aeson (FromJSON (..), ToJSON (..))
-import           Data.Password.Argon2 (Argon2, Password, PasswordCheck (..), PasswordHash)
+import Data.Aeson (FromJSON (..), ToJSON (..))
+import Data.Password.Argon2 (Argon2, Password, PasswordCheck (..), PasswordHash)
 import qualified Data.Password.Argon2 as Argon2
-import           Data.Time (UTCTime)
-import           Data.UUID (UUID)
-import           Database.PostgreSQL.Entity (Entity (..), delete, insert, selectById, selectOneByField)
-import           Database.PostgreSQL.Simple.FromField (FromField (..))
-import           Database.PostgreSQL.Simple.FromRow (FromRow (..))
-import           Database.PostgreSQL.Simple.ToField (ToField (..))
-import           Database.PostgreSQL.Simple.ToRow (ToRow (..))
-import           Database.PostgreSQL.Transact (DBT)
-import           GHC.TypeLits (ErrorMessage (..), TypeError)
-import Database.PostgreSQL.Simple (Only(Only))
+import Data.Time (UTCTime)
+import Data.UUID (UUID)
+import Database.PostgreSQL.Entity (Entity (..), delete, insert, selectById, selectOneByField)
+import Database.PostgreSQL.Simple (Only (Only))
+import Database.PostgreSQL.Simple.FromField (FromField (..))
+import Database.PostgreSQL.Simple.FromRow (FromRow (..))
+import Database.PostgreSQL.Simple.ToField (ToField (..))
+import Database.PostgreSQL.Simple.ToRow (ToRow (..))
+import Database.PostgreSQL.Transact (DBT)
+import GHC.TypeLits (ErrorMessage (..), TypeError)
 
-newtype UserId = UserId { getUserId :: UUID }
+newtype UserId
+  = UserId { getUserId :: UUID }
   deriving stock (Eq, Generic)
-  deriving newtype (Show, FromJSON, ToJSON, FromField, ToField)
+  deriving newtype (FromField, FromJSON, Show, ToField, ToJSON)
 
 data User
   = User { userId      :: UserId
@@ -31,8 +31,9 @@ data User
          , password    :: PasswordHash Argon2
          , createdAt   :: UTCTime
          , updatedAt   :: UTCTime
-         } deriving stock (Eq, Show, Generic)
-           deriving anyclass (ToRow, FromRow)
+         }
+  deriving stock (Eq, Generic, Show)
+  deriving anyclass (FromRow, ToRow)
 
 instance Entity User where
   tableName = "users"
@@ -49,15 +50,17 @@ data UserInfo
   = UserInfo { userId      :: UserId
              , username    :: Text
              , displayName :: Text
-             } deriving stock (Eq, Show, Generic)
-               deriving anyclass (ToJSON)
+             }
+  deriving stock (Eq, Generic, Show)
+  deriving anyclass (ToJSON)
 
 data NewUser
   = NewUser { username    :: Text
             , displayName :: Text
             , password    :: Password
-            } deriving stock (Show, Generic)
-              deriving anyclass (FromJSON)
+            }
+  deriving stock (Generic, Show)
+  deriving anyclass (FromJSON)
 
 -- | Type error! Do not use 'toJSON' on a 'Password'!
 instance TypeError (ErrMsg "JSON") => ToJSON Password where
@@ -75,7 +78,7 @@ deriving via Text instance ToField (PasswordHash a)
 deriving via Text instance FromField (PasswordHash a)
 
 hashPassword :: (MonadIO m) => Password -> m (PasswordHash Argon2)
-hashPassword = Argon2.hashPassword 
+hashPassword = Argon2.hashPassword
 
 validatePassword :: Password -> PasswordHash Argon2 -> Bool
 validatePassword inputPassword hashedPassword =
@@ -85,10 +88,10 @@ insertUser :: User -> DBT IO ()
 insertUser user = insert @User user
 
 getUserById :: UserId -> DBT IO User
-getUserById userId = selectById @User userId
+getUserById userId = selectById @User (Only userId)
 
 getUserByUsername :: Text -> DBT IO User
-getUserByUsername username = selectOneByField "username" username
+getUserByUsername username = selectOneByField "username" (Only username)
 
 deleteUser :: UserId -> DBT IO ()
 deleteUser userId = delete @User (Only userId)

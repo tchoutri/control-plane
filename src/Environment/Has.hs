@@ -17,7 +17,8 @@ grab :: forall field env m. (MonadReader env m, Has field env) => m field
 grab = asks $ obtain @field
 {-# INLINE grab #-}
 
-newtype Field (s :: Symbol) env = Field { unField :: env }
+newtype Field (s :: Symbol) env
+  = Field { unField :: env }
 
 instance forall s f env. (HasField s env f) => Has f (Field s env) where
   obtain :: Field s env -> f
