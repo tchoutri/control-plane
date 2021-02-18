@@ -6,10 +6,10 @@ import Control.Exception.Safe       (MonadCatch, try)
 import Control.Monad.Trans.Control  (MonadBaseControl)
 import Data.Pool                    (withResource)
 import Data.Time                    (NominalDiffTime)
-import Database.PostgreSQL.Simple   as PG
-import Database.PostgreSQL.Transact as PGT
+import Database.PostgreSQL.Simple   as PG (ConnectInfo, FromRow, Only (Only), Query, ToRow, close, connect)
+import Database.PostgreSQL.Transact as PGT (DBT, execute, formatQuery, query, runDBTSerializable)
 
-import ControlPlane.DB.Types
+import ControlPlane.DB.Types        (ConnectionPool, InternalError (NotFound, TooManyResults), createPool)
 
 data QueryNature = Select | Insert | Update | Delete
   deriving (Show, Eq)

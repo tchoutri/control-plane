@@ -1,5 +1,5 @@
 {-# LANGUAGE QuasiQuotes #-}
-module ControlPlane.DB.Job where
+module ControlPlane.Job.DB where
 
 import Data.Aeson
 import Data.Time
@@ -18,7 +18,7 @@ data Job
         , payload   :: Payload
         , createdAt :: UTCTime
         , runDate   :: UTCTime
-        , lockedAt :: Maybe UTCTime
+        , lockedAt  :: Maybe UTCTime
         , attempts  :: Integer
         } deriving stock (Eq, Show, Generic)
           deriving anyclass (FromJSON, ToJSON, FromRow)
@@ -91,4 +91,25 @@ getJob jobId = queryOne Select q (Only jobId)
   where q = [sql| SELECT id, payload, created_at, run_date, locked_at, attempts
                   FROM jobs
                   WHERE id = ?
+            |]
+
+lockJob :: Int -> UTCTime -> DBT IO ()
+lockJob jobId timestamp = execute Update q (timestamp, jobId)
+  where q = [sql| UPDATE jobs as j SET locked_at = ?
+                  WHERE j.id = ?
+            |]
+
+unlockJob :: Int -> DBT IO ()
+unlockJob jobId = execute Update q (Only jobId)
+  where q = [sql| UPDATE jobs as j SET locked_at = NULL
+                  WHERE j.id = ?
+            |]
+
+isJobLocked :: Int -> DBT IO (Only Bool)
+isJobLocked jobId = queryOne Select q (Only jobId)
+  where q = [sql| SELECT
+                    CASE WHEN locked_at IS NULL then false
+                         ELSE true
+                     END
+                   FROM jobs WHERE id = ?
             |]

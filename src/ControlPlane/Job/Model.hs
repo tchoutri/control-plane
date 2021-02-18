@@ -1,9 +1,9 @@
-module ControlPlane.Model.Job where
+module ControlPlane.Job.Model where
 
 import Data.Time (getCurrentTime, UTCTime)
 import Data.Aeson (FromJSON)
 
-import ControlPlane.DB.Job (Job (..), Payload)
+import ControlPlane.Job.DB (Job (..), Payload)
 
 data JobInfo
   = JobInfo { newPayload :: Payload

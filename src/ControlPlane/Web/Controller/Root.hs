@@ -5,7 +5,7 @@ import Lucid
 import Web.Scotty.Trans
 
 import ControlPlane.DB.Helpers
-import ControlPlane.DB.Job
+import ControlPlane.Job.DB
 import ControlPlane.Environment
 import ControlPlane.Web.Types
 import ControlPlane.Web.View.Root (view)

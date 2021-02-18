@@ -3,7 +3,7 @@ module ControlPlane.Web.Controller.API where
 import Web.Scotty.Trans (ActionT, json)
 
 import ControlPlane.DB.Helpers
-import ControlPlane.DB.Job
+import ControlPlane.Job.DB
 import ControlPlane.DB.Notification
 import ControlPlane.Environment
 import ControlPlane.Web.API.Helpers

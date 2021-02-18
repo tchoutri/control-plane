@@ -1,15 +1,17 @@
 module ControlPlane.Job (startJobService) where
 
-import Colourista.IO
-import Control.Concurrent
-import Data.Time
-import Data.Maybe (fromJust)
+import Colourista.IO            (cyanMessage, greenMessage)
+import Control.Concurrent       (threadDelay)
+import Data.Maybe               (fromJust)
+import Data.Time                (NominalDiffTime, addUTCTime, defaultTimeLocale, formatTime, getCurrentTime)
 
-import ControlPlane.DB.Helpers
-import ControlPlane.DB.Job
+import ControlPlane.DB.Helpers  (runDB)
+import ControlPlane.Job.DB      (Job (..), Payload (CheckWebsite, GrabJSON), Website (Website), createJob, deleteJob,
+                                 getJobs, lockJob, isJobLocked, unlockJob)
 import ControlPlane.Environment (ControlPlaneEnv (..), mkControlPlaneEnv)
-import ControlPlane.Job.Runner
-import ControlPlane.Model.Job
+import ControlPlane.Job.Runner  (JobRunner, startJobRunner)
+import ControlPlane.Job.Model   (JobInfo (JobInfo), mkJob)
+import Database.PostgreSQL.Simple (Only(Only))
 
 startJobService :: IO ()
 startJobService = do
@@ -34,9 +36,36 @@ processJobs = do
 
 processJob :: Job -> JobRunner IO ()
 processJob job = do
-  case payload job of
-    CheckWebsite w -> checkWebsite w
-    GrabJSON t     -> grabJSON t
+  result <- jobLocker job
+  case result of
+    Just payload -> do
+      void $ jobRunner payload
+      jobUnlocker $ fromJust $ jobId job
+    _                     -> pure ()
+
+jobRunner :: Payload -> JobRunner IO ()
+jobRunner (CheckWebsite w) = checkWebsite w
+jobRunner (GrabJSON t)     = grabJSON t
+
+jobLocker :: Job -> JobRunner IO (Maybe Payload)
+jobLocker job = do
+  let i = fromJust $ jobId job
+  liftIO $ cyanMessage $ "[Job] Locking job " <> show i
+  pool <- asks pgPool
+  ts <- liftIO getCurrentTime
+  result <- liftIO $ runDB pool $ isJobLocked i
+  case result of
+    Left err   -> print err >> pure Nothing
+    Right (Only True) -> pure Nothing
+    Right (Only False) -> do
+      void $ liftIO $ runDB pool $ lockJob i ts
+      pure $ Just (payload job)
+
+jobUnlocker :: Int -> JobRunner IO ()
+jobUnlocker i = do
+  liftIO $ cyanMessage $ "[Job] Unlocking job " <> show i
+  pool <- asks pgPool
+  liftIO $ void $ runDB pool $ unlockJob i
 
 deleteAndRequeue :: Job -> JobRunner IO ()
 deleteAndRequeue Job{..} = do
