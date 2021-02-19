@@ -1,0 +1,16 @@
+cradle:
+  cabal:
+    - path: "./src"
+      component: "lib:control-plane"
+
+    - path: "./app/tui/Main.hs"
+      component: "control-plane:exe:control-plane"
+
+    - path: "./app/server/Main.hs"
+      component: "control-plane:exe:control-plane-server"
+
+    - path: "./app/jobs/Main.hs"
+      component: "control-plane:exe:control-plane-jobs"
+
+    - path: "./test"
+      component: "control-plane:test:control-plane-test"

@@ -2,7 +2,7 @@ module ControlPlane.Web.View.Root where
 
 import Lucid
 
-import ControlPlane.DB.Job
+import ControlPlane.Job.DB
 import ControlPlane.Web.View.Base
 
 view :: [Job] -> Html ()

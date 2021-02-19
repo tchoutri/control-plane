@@ -34,6 +34,16 @@ To launch the server, run
 $ cabal exec -- control-plane-server start
 ```
 
+To launch the job runner, run
+
+```bash
+$ cabal exec -- control-plane-jobs 
+```
+
+You can start both of them in a tmux shell by running `start-tmux.sh`
+
+While the former and the latter do not need to reside on the same machine, they both need access to the database server.
+
 ## Feature map
 
 ## Notifications
@@ -44,10 +54,6 @@ $ cabal exec -- control-plane-server start
 ## Website monitoring
 
 * Cards with the domain name, port, current status (reachable / unreacheable since <timestamp>)
-
-## Job queue
-
-* Backed by `odd-jobs` + postgresql
 
 [Simple Haskell]: https://www.simplehaskell.org/badges/badge2.svg
 [GitHub Action]: https://github.com/tchoutri/control-plane/actions
