@@ -3,6 +3,7 @@
 -}
 module ControlPlane.Environment.Has
   ( Has (..)
+  , Field (..)
   , grab
   ) where
 
@@ -14,7 +15,7 @@ class Has field env where
 
 grab :: forall field env m. (MonadReader env m, Has field env) => m field
 grab = asks $ obtain @field
-{-# INLINE grab#-}
+{-# INLINE grab #-}
 
 newtype Field (s :: Symbol) env = Field { unField :: env }
 

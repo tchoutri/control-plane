@@ -26,10 +26,14 @@ common common-extensions
                       FlexibleContexts
                       FlexibleInstances
                       GeneralizedNewtypeDeriving
+                      InstanceSigs
+                      KindSignatures
                       MultiParamTypeClasses
                       NamedFieldPuns
                       OverloadedStrings
+                      RankNTypes
                       RecordWildCards
+                      ScopedTypeVariables
                       StandaloneDeriving
                       TypeApplications
                       TypeOperators
@@ -66,6 +70,7 @@ library
       ControlPlane.DB.Types
       ControlPlane.DB.User
       ControlPlane.Environment
+      ControlPlane.Environment.Has
       ControlPlane.Job
       ControlPlane.Job.Runner
       ControlPlane.Job.DB
@@ -87,8 +92,6 @@ library
       ControlPlane.Web.View.Base
       ControlPlane.Web.View.Root
       Network.Wai.Middleware.CSP
-  other-modules:
-      Paths_control_plane
   hs-source-dirs:
       src
   build-depends:
@@ -133,8 +136,6 @@ executable control-plane
   import: common-ghc-options
   import: common-rts-options
   main-is: Main.hs
-  other-modules:
-      Paths_control_plane
   hs-source-dirs:
       app/tui
   build-depends:
@@ -147,8 +148,6 @@ executable control-plane-server
   import: common-ghc-options
   import: common-rts-options
   main-is: Main.hs
-  other-modules:
-      Paths_control_plane
   hs-source-dirs:
       app/server
   build-depends:
@@ -176,12 +175,6 @@ test-suite control-plane-test
   import: common-rts-options
   type: exitcode-stdio-1.0
   main-is: Main.hs
-  other-modules:
-      DB.Helpers
-      DB.Job
-      DB.Notification
-      Model.Notification
-      Paths_control_plane
   hs-source-dirs:
       test
   build-depends:

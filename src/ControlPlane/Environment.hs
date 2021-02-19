@@ -2,6 +2,7 @@ module ControlPlane.Environment
   ( ControlPlaneEnv (..)
   , getConfig
   , mkControlPlaneEnv
+  , module ControlPlane.Environment.Has
   ) where
 
 import           Data.Time                  (NominalDiffTime)
@@ -11,6 +12,7 @@ import           Prelude                    hiding (Reader)
 
 import           ControlPlane.DB.Helpers
 import           ControlPlane.DB.Types
+import ControlPlane.Environment.Has
 
 -- *Env datatypes are parsed as-is from the outside
 data ControlPlaneConfig
@@ -49,7 +51,8 @@ parsePoolConfig =
 -- *Env datatypes are the ones that are passed in the application
 newtype ControlPlaneEnv
   = ControlPlaneEnv { pgPool :: ConnectionPool
-                    } deriving (Show)
+                    } deriving stock (Show)
+                      deriving (Has ConnectionPool) via Field "pgPool" ControlPlaneEnv
 
 mkControlPlaneEnv :: IO ControlPlaneEnv
 mkControlPlaneEnv = do
