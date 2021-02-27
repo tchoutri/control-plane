@@ -1,8 +1,8 @@
 packages: ./
 
-with-compiler: ghc-8.10.3
+with-compiler: ghc-8.10.4
 
-index-state: 2021-02-15T09:16:10Z
+index-state: 2021-02-20T17:27:09Z
 
 source-repository-package
     type: git

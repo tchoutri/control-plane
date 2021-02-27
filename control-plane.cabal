@@ -17,7 +17,8 @@ source-repository head
   location: https://github.com/tchoutri/control-plane
 
 common common-extensions
-  default-extensions: DataKinds
+  default-extensions: ConstraintKinds
+                      DataKinds
                       DeriveAnyClass
                       DeriveGeneric
                       DerivingStrategies
