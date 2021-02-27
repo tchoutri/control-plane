@@ -1,6 +1,6 @@
 module Main (main) where
 
-import ControlPlane.CLI (cliMain)
+import CLI (cliMain)
 
 main :: IO ()
 main = cliMain

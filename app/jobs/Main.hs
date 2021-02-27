@@ -1,6 +1,6 @@
 module Main where
 
-import ControlPlane.Job (startJobService)
+import Job (startJobService)
 
 main :: IO ()
 main = startJobService

@@ -1,6 +1,6 @@
 module Main where
 
-import ControlPlane.TUI (tuiMain)
+import TUI (tuiMain)
 
 main :: IO ()
 main = tuiMain
