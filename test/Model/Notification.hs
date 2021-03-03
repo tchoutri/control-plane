@@ -7,7 +7,7 @@ import Data.Maybe (fromJust)
 import Data.Aeson.Encode.Pretty
 import Data.String.QQ
 
-import ControlPlane.DB.Notification
+import DB.Notification
 
 spec :: Spec
 spec = do
@@ -26,11 +26,10 @@ spec = do
     "status": {
         "status": "unread"
     },
-    "receivedAt": "2020-12-24T10:26:34.815690388Z",
-    "device": "Telephone",
+    "message": "Bouh!",
     "title": "Notification!",
-    "notificationId": "00000000-0000-0000-0000-000000000000",
-    "message": "Bouh!"
+    "device": "Telephone",
+    "receivedAt": "2020-12-24T10:26:34.815690388Z",
+    "notificationId": "00000000-0000-0000-0000-000000000000"
 }|]
-
     encodePretty n1 `shouldBe` expectedPayload

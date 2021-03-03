@@ -1,4 +1,5 @@
 {-# LANGUAGE QuasiQuotes #-}
+{-# LANGUAGE OverloadedLists #-}
 module DB.Notification
   ( Notification (..)
   , NotificationId (..)
@@ -15,16 +16,17 @@ module DB.Notification
 import Control.Exception
 import Data.Aeson
 import Data.Time
-import Data.UUID                            (UUID)
-import Database.PostgreSQL.Simple           (Only (..))
+import Data.UUID (UUID)
+import Data.Vector (Vector)
+import Database.PostgreSQL.Entity
+import Database.PostgreSQL.Entity.DBT
 import Database.PostgreSQL.Simple.FromField (FromField (..), ResultError (..), returnError)
-import Database.PostgreSQL.Simple.FromRow   (FromRow (..))
+import Database.PostgreSQL.Simple.FromRow (FromRow (..))
 import Database.PostgreSQL.Simple.SqlQQ
-import Database.PostgreSQL.Simple.ToField   (Action (..), ToField (..))
-import Database.PostgreSQL.Simple.ToRow     (ToRow (..))
-import Database.PostgreSQL.Transact         (DBT)
+import Database.PostgreSQL.Simple.ToField (Action (..), ToField (..))
+import Database.PostgreSQL.Simple.ToRow (ToRow (..))
+import Database.PostgreSQL.Transact (DBT)
 
-import DB.Helpers
 import DB.Types   (InternalError (..))
 
 newtype NotificationId = NotificationId { getNotificationId :: UUID }
@@ -49,6 +51,18 @@ data Notification
                  , receivedAt     :: UTCTime
                  } deriving stock (Eq, Show, Generic)
                    deriving anyclass (ToJSON)
+
+instance Entity Notification where
+  tableName = "notifications"
+  primaryKey = "notification_id"
+  fields = [ "notification_id"
+           , "device"
+           , "title"
+           , "message"
+           , "received_at"
+           , "status"
+           , "read_at"
+           ]
 
 data Notification'
   = Notification' { notificationId :: NotificationId
@@ -88,7 +102,7 @@ instance FromRow Notification where
     status <- case (status', readAt) of
           (NotificationRead', Just ts)   -> pure $ NotificationRead ts
           (NotificationUnread', Nothing) -> pure NotificationUnread
-          _                              -> throw . ConstraintFailure $ "Incoherent status for status ('"<> show status' <>"') and readAt ('" <> show readAt <> "') for notification " <> show notificationId
+          _                              -> throw (InternalError $ ConstraintError $ "Incoherent status for status ('"<> show status' <>"') and readAt ('" <> show readAt <> "') for notification " <> show notificationId)
     pure Notification{..}
 
 instance ToRow Notification where
@@ -120,22 +134,14 @@ instance ToField NotificationStatusPayload where
 
 -- Request functions
 
-getNotifications :: DBT IO [Notification]
-getNotifications = queryMany Select q ()
-  where q = [sql| SELECT notification_id, device, title, message, received_at, status, read_at
-                  FROM notifications |]
+getNotifications :: DBT IO (Vector Notification)
+getNotifications = query_ Select (_select @Notification)
 
 getNotificationById :: NotificationId -> DBT IO Notification
-getNotificationById notificationId = queryOne Select q (Only notificationId)
-  where q = [sql| SELECT notification_id, device, title, message, received_at, status, read_at
-                  FROM notifications
-                  WHERE notification_id = ? |]
+getNotificationById notificationId = selectById @Notification notificationId
 
 insertNotification :: Notification -> DBT IO ()
-insertNotification notification = execute Insert q notification
-  where q = [sql| INSERT INTO notifications 
-                  (notification_id, device, title, message, received_at, status, read_at)
-                  VALUES (?,?,?,?,?,?,?) |]
+insertNotification notification = insert @Notification notification
 
 updateNotification :: Notification -> DBT IO ()
 updateNotification Notification{..} = execute Update q params

@@ -1,17 +1,17 @@
 module Job (startJobService) where
 
-import Colourista.IO            (cyanMessage, greenMessage)
-import Control.Concurrent       (threadDelay)
-import Data.Maybe               (fromJust)
-import Data.Time                (NominalDiffTime, addUTCTime, defaultTimeLocale, formatTime, getCurrentTime)
+import Colourista.IO (cyanMessage, greenMessage)
+import Control.Concurrent (threadDelay)
+import Data.Maybe (fromJust)
+import Data.Time (NominalDiffTime, addUTCTime, defaultTimeLocale, formatTime, getCurrentTime)
+import Database.PostgreSQL.Entity.DBT
+import Database.PostgreSQL.Simple (Only (Only))
 
-import DB.Helpers  (runDB)
-import Job.DB      (Job (..), Payload (CheckWebsite, GrabJSON), Website (Website), createJob, deleteJob,
-                                 getJobs, lockJob, isJobLocked, unlockJob)
 import Environment (ControlPlaneEnv (..), mkEnv)
-import Job.Runner  (JobRunner, startJobRunner)
-import Job.Model   (JobInfo (JobInfo), mkJob)
-import Database.PostgreSQL.Simple (Only(Only))
+import Job.DB (Job (..), Payload (CheckWebsite, GrabJSON), Website (Website), createJob, deleteJob, getJobs,
+               isJobLocked, lockJob, unlockJob)
+import Job.Model (JobInfo (JobInfo), mkJob)
+import Job.Runner (JobRunner, startJobRunner)
 
 startJobService :: IO ()
 startJobService = do

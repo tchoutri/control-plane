@@ -64,37 +64,32 @@ common common-rts-options
 library
   import: common-extensions
   import: common-ghc-options
-  exposed-modules:
-      CLI
-      DB.Helpers
-      DB.Notification
-      DB.Types
-      DB.User
-      Environment
-      Environment.Has
-      Job
-      Job.DB
-      Job.Model
-      Job.Runner
-      Model.Notification
-      Model.User
-      Server
-      TUI
-      TUI.UI
-      Web
-      Web.API.Error
-      Web.API.Helpers
-      Web.Controller.API
-      Web.Controller.Overview
-      Web.Controller.Root
-      Web.Errors
-      Web.Router
-      Web.Types
-      Web.View.Base
-      Web.View.Root
-      Network.Wai.Middleware.CSP
   hs-source-dirs:
-      src
+    src
+  exposed-modules:
+    CLI
+    DB.Notification
+    DB.Types
+    DB.User
+    Environment
+    Environment.Has
+    Job 
+    Job.DB
+    Job.Model
+    Job.Runner
+    Network.Wai.Middleware.CSP
+    Server
+    TUI
+    TUI.UI
+    Web
+    Web.API.Helpers
+    Web.Controller.API
+    Web.Controller.Root
+    Web.Errors
+    Web.Router
+    Web.Types
+    Web.View.Base
+    Web.View.Root
   build-depends:
     aeson                       ^>= 1.5.5,
     base                        ^>= 4.14.1,
@@ -109,6 +104,7 @@ library
     colourista                  ^>= 0.1.0,
     envparse                    ^>= 0.4.1,
     http-types                  ^>= 0.12.3,
+    pg-entity                   ^>= 0.0.1,
     http-client                 ^>= 0.7.5,
     http-client-tls             ^>= 0.3.5,
     lucid                       ^>= 2.9.12,
@@ -161,8 +157,6 @@ executable control-plane-jobs
   import: common-ghc-options
   import: common-rts-options
   main-is: Main.hs
-  other-modules:
-      Paths_control_plane
   hs-source-dirs:
       app/jobs
   build-depends:
@@ -192,6 +186,11 @@ test-suite control-plane-test
     , string-qq
     , time
     , uuid
+  other-modules:
+    DB.Helpers
+    DB.NotificationSpec
+    DB.JobSpec
+    Model.Notification
   mixins: base hiding (Prelude)
         , relude ( Relude as Prelude
                  , Relude.Unsafe)

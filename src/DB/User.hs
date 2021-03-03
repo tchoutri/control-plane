@@ -1,25 +1,24 @@
+{-# LANGUAGE DerivingVia #-}
+{-# LANGUAGE OverloadedLists #-}
 {-# LANGUAGE QuasiQuotes #-}
 {-# LANGUAGE UndecidableInstances #-}
-{-# LANGUAGE DerivingVia #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 
 module DB.User where
 
-import           Data.Aeson                           (FromJSON (..), ToJSON (..))
-import           Data.Password.Argon2                 (Argon2, Password, PasswordCheck (..), PasswordHash)
-import qualified Data.Password.Argon2                 as Argon2
-import           Data.Time                            (UTCTime)
-import           Data.UUID                            (UUID)
-import           Database.PostgreSQL.Simple           (Only (..))
+import           Data.Aeson (FromJSON (..), ToJSON (..))
+import           Data.Password.Argon2 (Argon2, Password, PasswordCheck (..), PasswordHash)
+import qualified Data.Password.Argon2 as Argon2
+import           Data.Time (UTCTime)
+import           Data.UUID (UUID)
+import           Database.PostgreSQL.Entity (Entity (..), delete, insert, selectById, selectOneByField)
 import           Database.PostgreSQL.Simple.FromField (FromField (..))
-import           Database.PostgreSQL.Simple.FromRow   (FromRow (..))
-import           Database.PostgreSQL.Simple.SqlQQ
-import           Database.PostgreSQL.Simple.ToField   (ToField (..))
-import           Database.PostgreSQL.Simple.ToRow     (ToRow (..))
-import           Database.PostgreSQL.Transact         (DBT)
-import           GHC.TypeLits                         (ErrorMessage (..), TypeError)
-
-import           DB.Helpers              
+import           Database.PostgreSQL.Simple.FromRow (FromRow (..))
+import           Database.PostgreSQL.Simple.ToField (ToField (..))
+import           Database.PostgreSQL.Simple.ToRow (ToRow (..))
+import           Database.PostgreSQL.Transact (DBT)
+import           GHC.TypeLits (ErrorMessage (..), TypeError)
+import Database.PostgreSQL.Simple (Only(Only))
 
 newtype UserId = UserId { getUserId :: UUID }
   deriving stock (Eq, Generic)
@@ -34,6 +33,17 @@ data User
          , updatedAt   :: UTCTime
          } deriving stock (Eq, Show, Generic)
            deriving anyclass (ToRow, FromRow)
+
+instance Entity User where
+  tableName = "users"
+  primaryKey = "user_id"
+  fields = [ "user_id"
+           , "username"
+           , "display_name"
+           , "password"
+           , "created_at"
+           , "updated_at"
+           ]
 
 data UserInfo
   = UserInfo { userId      :: UserId
@@ -72,24 +82,13 @@ validatePassword inputPassword hashedPassword =
   Argon2.checkPassword inputPassword hashedPassword == PasswordCheckSuccess
 
 insertUser :: User -> DBT IO ()
-insertUser user = execute Insert q user
-  where q = [sql| INSERT INTO users
-                  (user_id, username, display_name, password, created_at, updated_at)
-                  VALUES (?,?,?,?,?,?) |]
+insertUser user = insert @User user
 
 getUserById :: UserId -> DBT IO User
-getUserById userId = queryOne Select q (Only userId)
-  where q = [sql| SELECT user_id, username, display_name, password, created_at, updated_at
-                  FROM users
-                  WHERE user_id = ? |]
+getUserById userId = selectById @User userId
 
 getUserByUsername :: Text -> DBT IO User
-getUserByUsername username = queryOne Select q (Only username)
-  where q = [sql| SELECT user_id, username, display_name, password, created_at, updated_at
-                  FROM users
-                  WHERE username = ? |]
+getUserByUsername username = selectOneByField "username" username
 
 deleteUser :: UserId -> DBT IO ()
-deleteUser userId = execute Delete q (Only userId)
-  where q = [sql| DELETE FROM users
-                  WHERE user_id = ? |]
+deleteUser userId = delete @User (Only userId)

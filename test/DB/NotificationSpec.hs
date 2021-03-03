@@ -1,11 +1,12 @@
-module DB.Notification where
+module DB.NotificationSpec where
 
-import Relude.Unsafe                (read)
-import Test.Hspec
-import Test.Hspec.DB
+import Relude.Unsafe (read)
+import Test.Hspec (Spec, shouldBe)
+import Test.Hspec.DB (describeDB, itDB)
 
-import ControlPlane.DB.Notification (Notification (..), NotificationId (..), NotificationStatus (..), getNotificationById, insertNotification)
-import DB.Helpers
+import DB.Helpers (migrate)
+import DB.Notification (Notification (..), NotificationId (..), NotificationStatus (..), getNotificationById,
+                        insertNotification)
 
 notification1 :: Notification
 notification1 = 
@@ -19,7 +20,7 @@ notification1 =
 
 spec :: Spec
 spec = describeDB migrate "Notification DB" $ do
-  itDB "Insert notification" $ do
+  itDB "Insert" $ do
     insertNotification notification1
     result <- getNotificationById (notificationId notification1)
     pure $ result `shouldBe` notification1

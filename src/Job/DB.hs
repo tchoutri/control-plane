@@ -1,17 +1,19 @@
 {-# LANGUAGE QuasiQuotes #-}
+{-# LANGUAGE OverloadedLists #-}
 module Job.DB where
 
 import Data.Aeson
 import Data.Time
+import Data.Vector (Vector)
+import Database.PostgreSQL.Entity
+import Database.PostgreSQL.Entity.DBT
+import Database.PostgreSQL.Simple (Only (..))
 import Database.PostgreSQL.Simple.FromField
 import Database.PostgreSQL.Simple.FromRow
 import Database.PostgreSQL.Simple.SqlQQ
 import Database.PostgreSQL.Simple.ToField
 import Database.PostgreSQL.Simple.ToRow
-import Database.PostgreSQL.Simple (Only (..))
 import Database.PostgreSQL.Transact (DBT)
-
-import DB.Helpers 
 
 data Job
   = Job { jobId     :: Maybe Int
@@ -22,6 +24,17 @@ data Job
         , attempts  :: Integer
         } deriving stock (Eq, Show, Generic)
           deriving anyclass (FromJSON, ToJSON, FromRow)
+
+instance Entity Job where
+  tableName = "jobs"
+  primaryKey = "job_id"
+  fields = [ "job_id"
+           , "payload"
+           , "created_at"
+           , "run_date"
+           , "locked_at"
+           , "attempts"
+           ]
 
 newtype Website = Website { url :: Text }
   deriving stock (Eq, Show, Generic)
@@ -52,21 +65,18 @@ instance FromField Payload where
 instance ToRow Job where
   toRow Job{..} = toRow (payload, createdAt, runDate, lockedAt, attempts)
 
-getAllJobs :: DBT IO [Job]
-getAllJobs = queryMany Select q ()
-  where q = [sql| SELECT id, payload, created_at, run_date, locked_at, attempts
-                  FROM jobs
-            |]
+getAllJobs :: DBT IO (Vector Job)
+getAllJobs = query_ Select (_select @Job)
 
-getJobs :: UTCTime -> DBT IO [Job]
-getJobs currentTime = queryMany Select q (Only currentTime)
+getJobs :: UTCTime -> DBT IO (Vector Job)
+getJobs currentTime = query Select q (Only currentTime)
   where q = [sql| SELECT id, payload, created_at, run_date, locked_at, attempts
                   FROM jobs
                   WHERE run_date <= ?
             |]
 
-getRunningJobs :: DBT IO [Job]
-getRunningJobs = queryMany Select q ()
+getRunningJobs :: DBT IO (Vector Job)
+getRunningJobs = query Select q ()
   where q = [sql| SELECT id, payload, created_at, run_date, locked_at, attempts
                   FROM jobs
                   WHERE locked_at IS NOT NULL

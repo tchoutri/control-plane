@@ -2,7 +2,8 @@ module Web.Controller.API where
 
 import Web.Scotty.Trans (ActionT, json)
 
-import DB.Helpers
+import Database.PostgreSQL.Entity.DBT
+
 import Job.DB
 import DB.Notification
 import Environment

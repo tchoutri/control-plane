@@ -5,14 +5,13 @@ module Environment
   , module Environment.Has
   ) where
 
-import           Data.Time                  (NominalDiffTime)
+import           Data.Time (NominalDiffTime)
+import           Database.PostgreSQL.Entity.DBT (ConnectionPool, mkPool)
 import qualified Database.PostgreSQL.Simple as PG
-import           Env
-import           Prelude                    hiding (Reader)
+import           Env (AsUnread (unread), Error, Parser, Reader, help, parse, str, var)
+import           Prelude hiding (Reader)
 
-import DB.Helpers
-import DB.Types
-import Environment.Has
+import Environment.Has (Field (..), Has (..), grab)
 
 -- *Env datatypes are parsed as-is from the outside
 data Config
@@ -83,12 +82,6 @@ nonNegative nni =
   if nni >= 0
   then Right nni
   else Left . unread . show $ nni
-
--- bool :: Reader Error Bool
--- bool b =
---   case readMaybe b of
---     Nothing -> Left . unread . show $ b
---     Just b' -> Right b'
 
 timeout :: Reader Error NominalDiffTime
 timeout t = second fromIntegral (int >=> nonNegative $ t)

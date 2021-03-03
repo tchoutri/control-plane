@@ -4,8 +4,9 @@ import Colourista.IO (cyanMessage)
 import Control.Monad.Except (MonadError)
 import Data.Maybe (fromJust)
 import Data.Time (NominalDiffTime, addUTCTime, defaultTimeLocale, formatTime, getCurrentTime)
+import Database.PostgreSQL.Entity.DBT
 
-import DB.Helpers (runDB)
+
 import Environment (ControlPlaneEnv (..))
 import Job.DB (Job (..), Payload (CheckWebsite, GrabJSON), Website (Website), createJob, deleteJob, getJobs)
 import Job.Model (JobInfo (JobInfo), mkJob)

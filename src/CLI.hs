@@ -5,12 +5,12 @@ import qualified Data.Password.Argon2       as Argon2
 import           Data.Time
 import           Data.UUID.V4
 import           Options.Applicative
+import Database.PostgreSQL.Entity.DBT
 
-import           DB.Helpers  (runDB)
 import           DB.User     (NewUser (..), User (..), UserId (..))
 import qualified DB.User     as DB
 import           Environment (ControlPlaneEnv (..), mkEnv)
-import qualified Server      as Server
+import qualified Server
 
 newtype Options = Options Command
 

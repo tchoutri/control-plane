@@ -1,4 +1,5 @@
-module DB.Job (spec) where
+{-# LANGUAGE OverloadedLists #-}
+module DB.JobSpec (spec) where
 
 import Database.PostgreSQL.Simple (Only (..))
 import Relude.Unsafe              (read)
@@ -7,7 +8,7 @@ import Test.Hspec.DB
 import Data.Time
 import Database.PostgreSQL.Transact
 
-import ControlPlane.DB.Job
+import Job.DB
 import DB.Helpers
 
 job1 :: Job

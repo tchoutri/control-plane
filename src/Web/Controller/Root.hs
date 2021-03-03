@@ -3,8 +3,8 @@ module Web.Controller.Root
 
 import Lucid
 import Web.Scotty.Trans
+import Database.PostgreSQL.Entity.DBT
 
-import DB.Helpers
 import Job.DB
 import Environment
 import Web.Types
