@@ -1,4 +1,4 @@
-# Control Plane ![Simple Haskell][Simple Haskell] [![GitHub CI](https://github.com/tchoutri/control-plane/workflows/CI/badge.svg)][GitHub Action]
+# Control Plane [![CI-badge][CI-badge]][CI-url] ![simple-haskell][simple-haskell]
 
 ## Description
 
@@ -7,8 +7,7 @@ notifications endpoint for webhooks, etc.
 
 ## Build 
 
-The backend is implemented in Haskell. You will need the [Haskell Stack](https://docs.haskellstack.org/en/stable/README/) build tool
-to build it, as well as the Nix package manager to handle external dependencies.
+The backend is implemented in Haskell. You will need the Nix package manager to handle external dependencies.
 
 To build the backend without optimisations, run:
 
@@ -44,16 +43,14 @@ You can start both of them in a tmux shell by running `start-tmux.sh`
 
 While the former and the latter do not need to reside on the same machine, they both need access to the database server.
 
-## Feature map
+## Features
 
-## Notifications
+### Notifications
 
-* Accept webhooks to display notification toasts
-* Host a section for Pushover notifications
+### Website monitoring
 
-## Website monitoring
+* Cards with the domain name, port, current status (reachable / unreacheable since \<timestamp\>)
 
-* Cards with the domain name, port, current status (reachable / unreacheable since <timestamp>)
-
-[Simple Haskell]: https://www.simplehaskell.org/badges/badge2.svg
-[GitHub Action]: https://github.com/tchoutri/control-plane/actions
+[CI-url]: https://github.com/tchoutri/control-plane/actions
+[CI-badge]: https://img.shields.io/github/workflow/status/tchoutri/control-plane/CI?style=flat-square
+[simple-haskell]: https://img.shields.io/badge/Simple-Haskell-purple?style=flat-square
