@@ -1,5 +1,5 @@
-{-# LANGUAGE QuasiQuotes #-}
 {-# LANGUAGE OverloadedLists #-}
+{-# LANGUAGE QuasiQuotes #-}
 module DB.Notification
   ( Notification (..)
   , NotificationId (..)
@@ -7,31 +7,33 @@ module DB.Notification
   , NotificationPayload (..)
   , NewStatusPayload (..)
   , NotificationStatusPayload (..)
+  , readNotification
   , getNotificationById
   , insertNotification
   , getNotifications
   , updateNotification
   ) where
 
-import Control.Exception
-import Data.Aeson
-import Data.Time
+import Control.Exception (throw)
+import Data.Aeson (FromJSON, ToJSON (toJSON), object)
+import Data.Time (UTCTime, getCurrentTime)
 import Data.UUID (UUID)
 import Data.Vector (Vector)
-import Database.PostgreSQL.Entity
-import Database.PostgreSQL.Entity.DBT
+import Database.PostgreSQL.Entity (Entity (..), _select, insert, selectById, updateFieldsBy)
+import Database.PostgreSQL.Entity.DBT (DBError (ConstraintError), QueryNature (Select), query_)
+import Database.PostgreSQL.Simple (Only (..))
 import Database.PostgreSQL.Simple.FromField (FromField (..), ResultError (..), returnError)
 import Database.PostgreSQL.Simple.FromRow (FromRow (..))
-import Database.PostgreSQL.Simple.SqlQQ
 import Database.PostgreSQL.Simple.ToField (Action (..), ToField (..))
 import Database.PostgreSQL.Simple.ToRow (ToRow (..))
 import Database.PostgreSQL.Transact (DBT)
 
-import DB.Types   (InternalError (..))
+import DB.Types (InternalError (..))
 
-newtype NotificationId = NotificationId { getNotificationId :: UUID }
+newtype NotificationId
+  = NotificationId { getNotificationId :: UUID }
   deriving stock (Eq, Generic)
-  deriving newtype (Show, FromJSON, ToJSON, FromField, ToField)
+  deriving newtype (FromField, FromJSON, Show, ToField, ToJSON)
 
 data NotificationStatus
   = NotificationRead UTCTime
@@ -49,8 +51,9 @@ data Notification
                  , message        :: Text
                  , status         :: NotificationStatus
                  , receivedAt     :: UTCTime
-                 } deriving stock (Eq, Show, Generic)
-                   deriving anyclass (ToJSON)
+                 }
+  deriving stock (Eq, Generic, Show)
+  deriving anyclass (ToJSON)
 
 instance Entity Notification where
   tableName = "notifications"
@@ -72,11 +75,11 @@ data Notification'
                   , receivedAt     :: UTCTime
                   , status'        :: NotificationStatusEnum
                   , readAt         :: Maybe UTCTime
-                  } deriving stock (Eq, Show, Generic)
-                    deriving anyclass (FromRow, ToRow)
+                  }
+  deriving stock (Eq, Generic, Show)
+  deriving anyclass (FromRow, ToRow)
 
-data NotificationStatusEnum = NotificationRead' | NotificationUnread'
-  deriving (Eq,Show, Generic)
+data NotificationStatusEnum = NotificationRead' | NotificationUnread' deriving (Eq, Generic, Show)
 
 instance ToField NotificationStatusEnum where
   toField NotificationRead'   = Escape "Read"
@@ -86,7 +89,7 @@ instance FromField NotificationStatusEnum where
   fromField f mdata =
     case mdata of
       Nothing -> returnError UnexpectedNull f ""
-      Just bs -> 
+      Just bs ->
         case parseNotificationStatusEnum bs of
           Just a  -> pure a
           Nothing -> returnError ConversionFailed f $ "Conversion error: Expected 'status' enum, got " <> decodeUtf8 bs <> " instead."
@@ -116,17 +119,17 @@ data NotificationPayload
   = NotificationPayload { device  :: Text
                         , title   :: Text
                         , message :: Text
-                        } deriving stock (Eq, Show, Generic)
-                          deriving anyclass (FromJSON)
-
-newtype NewStatusPayload = NewStatusPayload { status :: NotificationStatusPayload }
-  deriving stock (Eq, Show, Generic)
+                        }
+  deriving stock (Eq, Generic, Show)
   deriving anyclass (FromJSON)
 
-data NotificationStatusPayload
-  = SetAsRead | SetAsUnread
-    deriving stock (Eq, Show, Generic)
-    deriving anyclass (FromJSON)
+newtype NewStatusPayload
+  = NewStatusPayload { status :: NotificationStatusPayload }
+  deriving stock (Eq, Generic, Show)
+  deriving anyclass (FromJSON)
+
+data NotificationStatusPayload = SetAsRead | SetAsUnread deriving stock (Eq, Generic, Show)
+  deriving anyclass (FromJSON)
 
 instance ToField NotificationStatusPayload where
   toField SetAsRead   = Escape "Read"
@@ -134,21 +137,23 @@ instance ToField NotificationStatusPayload where
 
 -- Request functions
 
+readNotification :: NotificationId -> DBT IO ()
+readNotification nid = do
+  ts <- liftIO getCurrentTime
+  void $ updateFieldsBy @Notification ["status", "read_at"] (primaryKey @Notification, nid) (NotificationRead', Just ts)
+
 getNotifications :: DBT IO (Vector Notification)
 getNotifications = query_ Select (_select @Notification)
 
 getNotificationById :: NotificationId -> DBT IO Notification
-getNotificationById notificationId = selectById @Notification notificationId
+getNotificationById notificationId = selectById @Notification (Only notificationId)
 
 insertNotification :: Notification -> DBT IO ()
 insertNotification notification = insert @Notification notification
 
 updateNotification :: Notification -> DBT IO ()
-updateNotification Notification{..} = execute Update q params
-    where q = [sql| UPDATE notifications
-                    SET (status, read_at) (?,?) 
-                    WHERE notification_id = (?)
-                    |]
-          params = case status of
-                      (NotificationRead ts) -> (NotificationRead', Just ts, notificationId)
-                      NotificationUnread  -> (NotificationUnread', Nothing, notificationId)
+updateNotification Notification{..} = void $ updateFieldsBy @Notification ["status", "read_at"] (primaryKey @Notification, notificationId) params
+  where
+    params = case status of
+                NotificationRead ts -> (NotificationRead', Just ts)
+                NotificationUnread  -> (NotificationUnread', Nothing)

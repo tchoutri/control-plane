@@ -1,9 +1,9 @@
 module Network.Wai.Middleware.CSP (cspHeaders) where
 
-import           Network.Wai.Middleware.AddHeaders    (addHeaders)
-import           Network.Wai                          (Middleware)
-import qualified Relude.Unsafe as U
 import qualified Data.Text as T
+import Network.Wai (Middleware)
+import Network.Wai.Middleware.AddHeaders (addHeaders)
+import qualified Relude.Unsafe as U
 
 cspHeaders :: Middleware
 cspHeaders = addHeaders
@@ -12,9 +12,9 @@ cspHeaders = addHeaders
   ]
   where
     glue :: [Text] -> Text
-    glue [] = "default-src 'none'"
+    glue []  = "default-src 'none'"
     glue [x] = x
-    glue xs = T.concat $ map (\x -> T.concat [x, "; "]) (U.init xs) ++ [U.last xs]
+    glue xs  = T.concat $ map (\x -> T.concat [x, "; "]) (U.init xs) ++ [U.last xs]
 
     policies :: [T.Text]
     policies = [ "default-src 'self'"

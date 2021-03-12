@@ -6,7 +6,8 @@ module DB.Types
 import Data.Aeson (ToJSON (..), object)
 import Database.PostgreSQL.Entity.DBT.Types
 
-newtype InternalError = InternalError DBError
+newtype InternalError
+  = InternalError DBError
   deriving newtype (Eq, Show)
 
 instance Exception InternalError

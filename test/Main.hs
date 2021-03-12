@@ -2,9 +2,9 @@ module Main (main) where
 
 import Test.Hspec
 
-import qualified Model.Notification as NotificationModel
-import qualified DB.NotificationSpec as NotificationDB
 import qualified DB.JobSpec as JobSpec
+import qualified DB.NotificationSpec as NotificationDB
+import qualified Model.Notification as NotificationModel
 
 main :: IO ()
 main = hspec spec

@@ -1,13 +1,13 @@
 module Web where
 
-import Colourista.IO            (greenMessage)
+import Colourista.IO (greenMessage)
 import Network.Wai.Handler.Warp (defaultSettings, setPort)
-import Prelude                  hiding (get)
-import Web.Scotty.Trans         (Options (Options), scottyOptsT)
+import Prelude hiding (get)
+import Web.Scotty.Trans (Options (Options), scottyOptsT)
 
 import Environment (ControlPlaneEnv, mkEnv)
-import Web.Router  (router)
-import Web.Types   (WebM, runWebM)
+import Web.Router (router)
+import Web.Types (WebM, runWebM)
 
 startWebService :: IO ()
 startWebService = do

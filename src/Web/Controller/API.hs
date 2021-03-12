@@ -4,11 +4,11 @@ import Web.Scotty.Trans (ActionT, json)
 
 import Database.PostgreSQL.Entity.DBT
 
-import Job.DB
 import DB.Notification
+import DB.Types
 import Environment
+import Job.DB
 import Web.API.Helpers
-import Web.Errors
 import Web.Types
 
 jobs :: ActionT LText WebM ()
@@ -16,8 +16,8 @@ jobs = do
   pool <- asks pgPool
   result <- liftIO $ runDB pool getAllJobs
   case result of
-    Right dbJobs  -> json dbJobs
-    Left errMsg -> err500 (show errMsg)
+    Right dbJobs -> json dbJobs
+    Left err     -> json (InternalError err)
 
 job :: ActionT LText WebM ()
 job = do
@@ -26,7 +26,7 @@ job = do
   result <- liftIO $ runDB pool (getJob jobId)
   case result of
     Right dbJobs -> json dbJobs
-    Left errMsg -> err500 (show errMsg)
+    Left err     -> json (InternalError err)
 
 notifications :: ActionT LText WebM ()
 notifications = do
@@ -34,4 +34,4 @@ notifications = do
   result <- liftIO $ runDB pool getNotifications
   case result of
     Right notifs -> json notifs
-    Left errMsg -> err500 (show errMsg)
+    Left err     -> json (InternalError err)

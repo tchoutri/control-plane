@@ -1,7 +1,7 @@
 module Web.API.Error where
 
-import Web.Scotty.Trans
 import Network.HTTP.Types.Status
+import Web.Scotty.Trans
 
 import DB.Types
 import Web.Types

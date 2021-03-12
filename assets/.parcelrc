@@ -1,6 +1,0 @@
-{
-  "bundler": "@parcel/bundler-default",
-  "packagers": {
-    "*": "@parcel/packager-raw"
-  }
-}

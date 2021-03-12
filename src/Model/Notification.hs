@@ -2,10 +2,10 @@
 -}
 module Model.Notification where
 
-import Data.UUID.V4 (nextRandom)
 import Data.Time (getCurrentTime)
+import Data.UUID.V4 (nextRandom)
 
-import DB.Notification
+import DB.Notification (Notification (..), NotificationId (..), NotificationPayload (..), NotificationStatus (..))
 
 mkNotification :: (MonadIO m) => NotificationPayload -> m Notification
 mkNotification NotificationPayload {..} = do

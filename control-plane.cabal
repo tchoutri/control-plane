@@ -84,33 +84,30 @@ library
     Web
     Web.API.Helpers
     Web.Controller.API
-    Web.Controller.Root
-    Web.Errors
+    Web.Controller.Home
+    Web.Error
     Web.Router
+    Web.Templates
     Web.Types
     Web.View.Base
-    Web.View.Root
+    Web.View.Home
   build-depends:
     aeson                       ^>= 1.5.5,
-    base                        ^>= 4.14.1,
-    text                        ^>= 1.2.4,
-    time                        ^>= 1.9.3,
-    unordered-containers        ^>= 0.2.13,
-    vector                      ^>= 0.12.1,
     async                       ^>= 2.2.2,
+    base                        ^>= 4.14.1,
     brick                       ^>= 0.60.2,
-    mtl                         ^>= 2.2.2,
-    directory                   ^>= 1.3.6,
     colourista                  ^>= 0.1.0,
+    directory                   ^>= 1.3.6,
     envparse                    ^>= 0.4.1,
-    http-types                  ^>= 0.12.3,
-    pg-entity                   ^>= 0.0.1,
     http-client                 ^>= 0.7.5,
     http-client-tls             ^>= 0.3.5,
-    lucid                       ^>= 2.9.12,
+    http-types                  ^>= 0.12.3,
     monad-control               ^>= 1.0.2,
+    mtl                         ^>= 2.2.2,
+    mustache                    ^>= 2.3.1,
     optparse-applicative        ^>= 0.16.1,
     password                    ^>= 2.1.0.0,
+    pg-entity                   ^>= 0.0.1,
     pg-transact                 ^>= 0.3.1,
     postgresql-simple           ^>= 0.6.4,
     postgresql-simple-migration ^>= 0.1.15,
@@ -118,12 +115,16 @@ library
     resource-pool               ^>= 0.2.3,
     safe-exceptions             ^>= 0.1.7,
     scotty                      ^>= 0.12,
-    wai                         ^>= 3.2.3,
-    wai-extra                   ^>= 3.1.6,
-    warp                        ^>= 3.3.13,
+    text                        ^>= 1.2.4,
+    time                        ^>= 1.9.3,
+    unordered-containers        ^>= 0.2.13,
     uuid                        ^>= 1.3.13,
+    vector                      ^>= 0.12.1,
+    wai                         ^>= 3.2.3,
     wai-cors                    ^>= 0.2.7,
+    wai-extra                   ^>= 3.1.6,
     wai-middleware-static       ^>= 0.9.0,
+    warp                        ^>= 3.3.13,
   mixins: base hiding (Prelude)
         , relude ( Relude as Prelude
                  , Relude.Unsafe)
@@ -182,6 +183,7 @@ test-suite control-plane-test
     , pg-transact
     , postgresql-simple
     , postgresql-simple-migration
+    , hspec-expectations-lifted
     , relude
     , string-qq
     , time

@@ -1,5 +1,5 @@
-{-# LANGUAGE QuasiQuotes #-}
 {-# LANGUAGE OverloadedLists #-}
+{-# LANGUAGE QuasiQuotes #-}
 module Job.DB where
 
 import Data.Aeson
@@ -22,8 +22,9 @@ data Job
         , runDate   :: UTCTime
         , lockedAt  :: Maybe UTCTime
         , attempts  :: Integer
-        } deriving stock (Eq, Show, Generic)
-          deriving anyclass (FromJSON, ToJSON, FromRow)
+        }
+  deriving stock (Eq, Generic, Show)
+  deriving anyclass (FromJSON, FromRow, ToJSON)
 
 instance Entity Job where
   tableName = "jobs"
@@ -36,13 +37,15 @@ instance Entity Job where
            , "attempts"
            ]
 
-newtype Website = Website { url :: Text }
-  deriving stock (Eq, Show, Generic)
+newtype Website
+  = Website { url :: Text }
+  deriving stock (Eq, Generic, Show)
   deriving newtype (FromJSON, ToJSON)
 
-data Payload = CheckWebsite Website
-             | GrabJSON Text
-  deriving stock (Eq, Show, Generic)
+data Payload
+  = CheckWebsite Website
+  | GrabJSON Text
+  deriving stock (Eq, Generic, Show)
 
 instance ToJSON Payload where
   toJSON = genericToJSON payloadJSONOptions
@@ -70,49 +73,35 @@ getAllJobs = query_ Select (_select @Job)
 
 getJobs :: UTCTime -> DBT IO (Vector Job)
 getJobs currentTime = query Select q (Only currentTime)
-  where q = [sql| SELECT id, payload, created_at, run_date, locked_at, attempts
+  where q = [sql| SELECT job_id, payload, created_at, run_date, locked_at, attempts
                   FROM jobs
                   WHERE run_date <= ?
             |]
 
 getRunningJobs :: DBT IO (Vector Job)
-getRunningJobs = query Select q ()
-  where q = [sql| SELECT id, payload, created_at, run_date, locked_at, attempts
-                  FROM jobs
-                  WHERE locked_at IS NOT NULL
-            |]
+getRunningJobs = selectWhereNotNull @Job ["locked_at"]
 
 createJob :: Job -> DBT IO (Only Int)
 createJob job = queryOne Insert q job
   where q = [sql| INSERT INTO jobs
-                  (id, payload, created_at, run_date, locked_at, attempts)
+                  (job_id, payload, created_at, run_date, locked_at, attempts)
                   VALUES (DEFAULT,?,?,?,?,?)
-                  RETURNING id
+                  RETURNING job_id
             |]
 
 deleteJob :: Int -> DBT IO ()
-deleteJob jobId = execute Delete q (Only jobId)
-  where q = [sql| DELETE FROM jobs
-                  WHERE id = ?
-            |]
+deleteJob jobId = delete @Job (Only jobId)
 
 getJob :: Int -> DBT IO Job
-getJob jobId = queryOne Select q (Only jobId)
-  where q = [sql| SELECT id, payload, created_at, run_date, locked_at, attempts
-                  FROM jobs
-                  WHERE id = ?
-            |]
+getJob jobId = selectById @Job (Only jobId)
 
 lockJob :: Int -> UTCTime -> DBT IO ()
-lockJob jobId timestamp = execute Update q (timestamp, jobId)
-  where q = [sql| UPDATE jobs as j SET locked_at = ?
-                  WHERE j.id = ?
-            |]
+lockJob jobId timestamp = void $ updateFieldsBy @Job ["locked_at"] (primaryKey @Job, jobId) (Only timestamp)
 
 unlockJob :: Int -> DBT IO ()
-unlockJob jobId = execute Update q (Only jobId)
+unlockJob jobId = void $ execute Update q (Only jobId)
   where q = [sql| UPDATE jobs as j SET locked_at = NULL
-                  WHERE j.id = ?
+                  WHERE j.job_id = ?
             |]
 
 isJobLocked :: Int -> DBT IO (Only Bool)
@@ -121,5 +110,5 @@ isJobLocked jobId = queryOne Select q (Only jobId)
                     CASE WHEN locked_at IS NULL then false
                          ELSE true
                      END
-                   FROM jobs WHERE id = ?
+                   FROM jobs WHERE job_id = ?
             |]
