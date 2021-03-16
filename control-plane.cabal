@@ -111,7 +111,7 @@ library
     pg-transact                 ^>= 0.3.1,
     postgresql-simple           ^>= 0.6.4,
     postgresql-simple-migration ^>= 0.1.15,
-    relude                      ^>= 0.7.0,
+    relude                      ^>= 1.0,
     resource-pool               ^>= 0.2.3,
     safe-exceptions             ^>= 0.1.7,
     scotty                      ^>= 0.12,
@@ -127,7 +127,9 @@ library
     warp                        ^>= 3.3.13,
   mixins: base hiding (Prelude)
         , relude ( Relude as Prelude
-                 , Relude.Unsafe)
+                 , Relude.Unsafe
+                 , Relude.Monad
+                 )
 
 executable control-plane
   import: common-extensions

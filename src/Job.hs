@@ -10,6 +10,6 @@ startJobService :: IO ()
 startJobService = do
   greenMessage "[+] Starting job worker"
   env <- mkEnv
-  forever $ do
+  void $ infinitely $ do
     threadDelay $ 600 * 100000 -- 1 minute
     startJobRunner env processJobs

@@ -1,5 +1,4 @@
 {-# LANGUAGE OverloadedLists #-}
-{-# LANGUAGE QuasiQuotes #-}
 module DB.Notification
   ( Notification (..)
   , NotificationId (..)
