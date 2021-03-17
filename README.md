@@ -30,13 +30,13 @@ and source the file in your environment.
 To launch the server, run 
 
 ```bash
-$ cabal exec -- control-plane-server start
+$ cabal run exe:control-plane-server start
 ```
 
 To launch the job runner, run
 
 ```bash
-$ cabal exec -- control-plane-jobs 
+$ cabal run exe:control-plane-jobs 
 ```
 
 You can start both of them in a tmux shell by running `start-tmux.sh`
