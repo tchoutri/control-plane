@@ -2,17 +2,19 @@
 {-# LANGUAGE QuasiQuotes #-}
 module Job.DB where
 
-import Data.Aeson
-import Data.Time
+import Data.Aeson (FromJSON (parseJSON), Options (sumEncoding),
+                   SumEncoding (TaggedObject, contentsFieldName, tagFieldName), ToJSON (toJSON), defaultOptions,
+                   genericParseJSON, genericToJSON)
+import Data.Time (UTCTime)
 import Data.Vector (Vector)
-import Database.PostgreSQL.Entity
-import Database.PostgreSQL.Entity.DBT
+import Database.PostgreSQL.Entity (Entity (..), _select, delete, selectById, selectWhereNotNull, updateFieldsBy)
+import Database.PostgreSQL.Entity.DBT (QueryNature (Insert, Select, Update), execute, query, queryOne, query_)
 import Database.PostgreSQL.Simple (Only (..))
-import Database.PostgreSQL.Simple.FromField
-import Database.PostgreSQL.Simple.FromRow
-import Database.PostgreSQL.Simple.SqlQQ
-import Database.PostgreSQL.Simple.ToField
-import Database.PostgreSQL.Simple.ToRow
+import Database.PostgreSQL.Simple.FromField (FromField (..), fromJSONField)
+import Database.PostgreSQL.Simple.FromRow (FromRow)
+import Database.PostgreSQL.Simple.SqlQQ (sql)
+import Database.PostgreSQL.Simple.ToField (ToField (..), toJSONField)
+import Database.PostgreSQL.Simple.ToRow (ToRow (..))
 import Database.PostgreSQL.Transact (DBT)
 
 data Job
