@@ -9,7 +9,7 @@ import Database.PostgreSQL.Entity.DBT (runDB)
 import Database.PostgreSQL.Simple (Only (..))
 
 import Environment (ControlPlaneEnv (..))
-import Job.DB (Job (..), Payload (CheckWebsite, GrabJSON), Website (Website), createJob, deleteJob, getJobs,
+import Job.DB (Job (..), Payload (..), Website (..), createJob, deleteJob, getJobs,
                isJobLocked, lockJob, unlockJob)
 import Job.Model (JobInfo (JobInfo), mkJob)
 
@@ -45,7 +45,6 @@ processJob job = do
 
 runJob :: Payload -> JobRunner IO ()
 runJob (CheckWebsite w) = checkWebsite w
-runJob (GrabJSON t)     = grabJSON t
 
 deleteAndRequeue :: Job -> JobRunner IO ()
 deleteAndRequeue Job{..} = do
@@ -81,7 +80,3 @@ checkWebsite (Website url) = do
   putTextLn $ "Checking website " <> url
   liftIO $ threadDelay 10000000
   putTextLn $ "Website checked!" <> url
-
-grabJSON :: Text -> JobRunner IO ()
-grabJSON  t =
-  putTextLn $ "Grabbing JSON " <> t

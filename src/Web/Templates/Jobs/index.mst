@@ -1,3 +1,17 @@
+<header class="bg-white shadow">
+  <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+    <h1 class="text-3xl font-bold text-gray-900 inline">
+      Dashboard
+    </h1>
+    <a type="button"
+       class="border border-indigo-500 text-indigo-500 rounded-md px-4 py-2 m-2 transition duration-500 ease select-none hover:text-white
+              hover:bg-indigo-600 focus:outline-none focus:shadow-outline inline"
+       href="/jobs/new">
+      New Job
+  </a>
+  </div>
+</header>
+
 <table class="border-collapse w-full">
   <thead>
     <tr>
@@ -5,6 +19,7 @@
       <th class="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">Created at</th>
       <th class="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">Run date</th>
       <th class="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">Locked at</th>
+      <th class="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">Delete</th>
     </tr>
   </thead>
   <tbody>
@@ -26,7 +41,15 @@
           <span class="lg:hidden absolute top-0 left-0 bg-blue-200 px-2 py-1 text-xs font-bold uppercase">Locked at</span>
           {{locked}}
         </td>
-      </tr>
+        <td class="w-full lg:w-auto p-3 text-gray-800 text-center border border-b text-center block lg:table-cell relative lg:static">
+          <form action="/jobs/delete/{{jobId}}" method="POST">
+            <button>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-7 stroke-current text-red-600">
+                <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
+              </svg>
+            </button>
+          </form>
+        </td>
     {{/jobs}}
   </tbody>
 </table>

@@ -16,6 +16,7 @@ import Database.PostgreSQL.Simple.SqlQQ (sql)
 import Database.PostgreSQL.Simple.ToField (ToField (..), toJSONField)
 import Database.PostgreSQL.Simple.ToRow (ToRow (..))
 import Database.PostgreSQL.Transact (DBT)
+import Web.Scotty.Trans (Parsable)
 
 data Job
   = Job { jobId     :: Maybe Int
@@ -42,11 +43,10 @@ instance Entity Job where
 newtype Website
   = Website { url :: Text }
   deriving stock (Eq, Generic, Show)
-  deriving newtype (FromJSON, ToJSON)
+  deriving newtype (FromJSON, ToJSON, Parsable)
 
 data Payload
   = CheckWebsite Website
-  | GrabJSON Text
   deriving stock (Eq, Generic, Show)
 
 instance ToJSON Payload where

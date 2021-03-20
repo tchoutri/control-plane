@@ -11,6 +11,10 @@
   - "-XTypeApplications"
   - "-XViewPatterns"
 - ignore:
+    name: Avoid lambda
+- ignore:
+    name: Use newtype instead of data
+- ignore:
     name: Use head
 - ignore:
     name: Use Foldable.forM_
