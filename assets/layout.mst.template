@@ -17,7 +17,8 @@
               <div class="hidden md:block">
                 <div class="ml-10 flex items-baseline space-x-4">
                   <!-- Current: "bg-gray-900 text-white", Default: "text-gray-300 hover:bg-gray-700 hover:text-white" -->
-                  <a href="#" class="bg-gray-900 text-white px-3 py-2 rounded-md text-sm font-medium">Dashboard</a>
+                  <a href="/" class="bg-gray-900 text-white px-3 py-2 rounded-md text-sm font-medium">Dashboard</a>
+                  <a href="/jobs" class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Jobs</a>
                 </div>
               </div>
             </div>
@@ -105,10 +106,6 @@
           </div>
           <div class="pt-4 pb-3 border-t border-gray-700">
             <div class="flex items-center px-5">
-              <div class="ml-3">
-                <div class="text-base font-medium leading-none text-white">Tom Cook</div>
-                <div class="text-sm font-medium leading-none text-gray-400">tom@example.com</div>
-              </div>
               <button class="ml-auto bg-gray-800 flex-shrink-0 p-1 rounded-full text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-white">
                 <span class="sr-only">View notifications</span>
                 <!-- Heroicon name: outline/bell -->
@@ -128,6 +125,9 @@
           </div>
         </div>
       </nav>
+      <div class="flash-alert">
+        {{{flash}}}
+      </div>
 
       <header class="bg-white shadow">
         <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">

@@ -6,14 +6,13 @@ import Database.PostgreSQL.Entity.DBT
 
 import DB.Notification
 import DB.Types
-import Environment
 import Job.DB
 import Web.API.Helpers
 import Web.Types
 
 jobs :: ActionT LText WebM ()
 jobs = do
-  pool <- asks pgPool
+  pool <- asks dbPool
   result <- liftIO $ runDB pool getAllJobs
   case result of
     Right dbJobs -> json dbJobs
@@ -22,7 +21,7 @@ jobs = do
 job :: ActionT LText WebM ()
 job = do
   jobId <- tryAction $ parseParam "jobId"
-  pool <- asks pgPool
+  pool <- asks dbPool
   result <- liftIO $ runDB pool (getJob jobId)
   case result of
     Right dbJobs -> json dbJobs
@@ -30,7 +29,7 @@ job = do
 
 notifications :: ActionT LText WebM ()
 notifications = do
-  pool <- asks pgPool
+  pool <- asks dbPool
   result <- liftIO $ runDB pool getNotifications
   case result of
     Right notifs -> json notifs
